@@ -63,16 +63,32 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     );
   };
 
+  // Handler for clicking on the card
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't expand/collapse if clicking on the switch
+    if (e.target instanceof Element && (
+        e.target.closest('button[role="switch"]') ||
+        e.target.closest('input[type="checkbox"]')
+      )) {
+      return;
+    }
+    
+    // Only Long Term Disability can expand
+    if (title === "Long Term Disability") {
+      setIsExpanded(!isExpanded);
+    }
+  };
+
   // For long term disability with collapsible content
   if (title === "Long Term Disability") {
     return (
       <Collapsible
         open={isExpanded}
         onOpenChange={setIsExpanded}
-        className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""}`}
+        className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""} cursor-pointer`}
       >
-        {/* Card layout with dedicated icon column */}
-        <div className="flex w-full">
+        {/* Card layout with dedicated icon column - now clickable */}
+        <div className="flex w-full" onClick={handleCardClick}>
           {/* Icon column - centered vertically and horizontally */}
           <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
             <img
@@ -100,7 +116,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               <div className="flex items-center gap-3 shrink-0">
                 {price && formatPrice(price)}
                 
-                <div className="flex items-center">
+                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                   <Switch 
                     checked={enabled}
                     onCheckedChange={(checked) => onToggle && onToggle(checked)}

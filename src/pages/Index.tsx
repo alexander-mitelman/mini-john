@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -143,7 +144,7 @@ const Index = () => {
               title="Long Term Disability"
               description="Protect your income when you need it most"
               price={quotes.ltd?.price || "$0.00/week"}
-              isExpanded={false}
+              isExpanded={true} {/* Set to true to expand by default */}
               features={longTermDisabilityFeatures}
               enabled={enabledProducts.ltd}
               onToggle={(enabled) => handleToggleProduct('ltd', enabled)}
