@@ -29,6 +29,17 @@ interface ProductTriggers {
  * Fetches and updates quotes based on changes to user information
  */
 export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
+  // Ensure annualSalary is derived from income if needed
+  const enrichedInfo = {
+    ...individualInfo,
+    // Convert income string to annualSalary number if annualSalary is missing
+    annualSalary: individualInfo.annualSalary || 
+      (individualInfo.income ? parseInt(individualInfo.income.replace(/\$|,/g, '')) : 0),
+    // Ensure default values for coverage
+    employeeCoverage: individualInfo.employeeCoverage || 20000,
+    spouseCoverage: individualInfo.spouseCoverage || 10000,
+  };
+
   // We'll store results for each product in an object:
   const [quotes, setQuotes] = useState<ProductQuotes>({
     ltd: null,
@@ -45,11 +56,11 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const [error, setError] = useState<string | null>(null);
 
   // We'll store old values of age, salary, zipCode
-  const prevAgeRef = useRef(individualInfo.age);
-  const prevSalaryRef = useRef(individualInfo.annualSalary);
-  const prevZipRef = useRef(individualInfo.zipCode);
-  const prevEmployeeCoverageRef = useRef(individualInfo.employeeCoverage);
-  const prevSpouseCoverageRef = useRef(individualInfo.spouseCoverage);
+  const prevAgeRef = useRef(enrichedInfo.age);
+  const prevSalaryRef = useRef(enrichedInfo.annualSalary);
+  const prevZipRef = useRef(enrichedInfo.zipCode);
+  const prevEmployeeCoverageRef = useRef(enrichedInfo.employeeCoverage);
+  const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
 
   // On mount, ensure we have a token
   useEffect(() => {
@@ -130,11 +141,11 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     if (!isServerCalculations()) {
       return;
     }
-    const changedAge = individualInfo.age !== prevAgeRef.current;
-    const changedSalary = individualInfo.annualSalary !== prevSalaryRef.current;
-    const changedZip = individualInfo.zipCode !== prevZipRef.current;
-    const changedEmployeeCoverage = individualInfo.employeeCoverage !== prevEmployeeCoverageRef.current;
-    const changedSpouseCoverage = individualInfo.spouseCoverage !== prevSpouseCoverageRef.current;
+    const changedAge = enrichedInfo.age !== prevAgeRef.current;
+    const changedSalary = enrichedInfo.annualSalary !== prevSalaryRef.current;
+    const changedZip = enrichedInfo.zipCode !== prevZipRef.current;
+    const changedEmployeeCoverage = enrichedInfo.employeeCoverage !== prevEmployeeCoverageRef.current;
+    const changedSpouseCoverage = enrichedInfo.spouseCoverage !== prevSpouseCoverageRef.current;
 
     const productsToFetch: string[] = [];
 
@@ -158,7 +169,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           // accident should be fetched only once, because it doesn't have any dependencies
         }
         // Skip 'std' if there's no salary info
-        else if (product === 'std' && individualInfo.annualSalary && individualInfo.annualSalary <= 0) { 
+        else if (product === 'std' && enrichedInfo.annualSalary && enrichedInfo.annualSalary <= 0) { 
           // Do nothing
         } 
         else {
@@ -169,26 +180,26 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
     if (productsToFetch.length > 0) {
       debouncedFetchProducts(productsToFetch, {
-        age: individualInfo.age,
-        annualSalary: individualInfo.annualSalary,
-        zipCode: individualInfo.zipCode,
-        employeeCoverage: individualInfo.employeeCoverage,
-        spouseCoverage: individualInfo.spouseCoverage,
+        age: enrichedInfo.age,
+        annualSalary: enrichedInfo.annualSalary,
+        zipCode: enrichedInfo.zipCode,
+        employeeCoverage: enrichedInfo.employeeCoverage,
+        spouseCoverage: enrichedInfo.spouseCoverage,
       });
     }
 
-    prevAgeRef.current = individualInfo.age;
-    prevSalaryRef.current = individualInfo.annualSalary;
-    prevZipRef.current = individualInfo.zipCode;
-    prevEmployeeCoverageRef.current = individualInfo.employeeCoverage;
-    prevSpouseCoverageRef.current = individualInfo.spouseCoverage;
+    prevAgeRef.current = enrichedInfo.age;
+    prevSalaryRef.current = enrichedInfo.annualSalary;
+    prevZipRef.current = enrichedInfo.zipCode;
+    prevEmployeeCoverageRef.current = enrichedInfo.employeeCoverage;
+    prevSpouseCoverageRef.current = enrichedInfo.spouseCoverage;
 
     // Cleanup to avoid memory leaks
     return () => {
       // debouncedFetchProducts.cancel();
     };
-  }, [individualInfo.age, individualInfo.annualSalary, individualInfo.zipCode, 
-    individualInfo.employeeCoverage, individualInfo.spouseCoverage, debouncedFetchProducts, quotes.accident]);
+  }, [enrichedInfo.age, enrichedInfo.annualSalary, enrichedInfo.zipCode, 
+    enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident]);
 
   return {
     quotes,
