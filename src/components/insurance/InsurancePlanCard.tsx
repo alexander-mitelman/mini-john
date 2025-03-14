@@ -30,6 +30,22 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
+  // Format the price display
+  const formatPrice = (price: string) => {
+    if (!price) return "";
+    const parts = price.split("/");
+    return (
+      <>
+        <span className="font-[900] text-[rgba(102,112,133,1)]">
+          {parts[0]}
+        </span>
+        <span className="text-[12px] text-[rgba(181,179,179,1)]">
+          {parts.length > 1 ? `/${parts[1]}` : ""}
+        </span>
+      </>
+    );
+  };
+
   // For long term disability with collapsible content
   if (title === "Long Term Disability") {
     return (
@@ -46,21 +62,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
             />
             <div className="flex flex-col items-stretch mt-1.5">
-              <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito">
+              <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700]">
                 {title}
               </h3>
-              <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito">
+              <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito-sans font-[400]">
                 {description}
               </p>
             </div>
           </div>
           <div className="flex items-center">
-            {!isExpanded && (
+            {!isExpanded && price && (
               <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] text-right mr-2">
-                $28.21
-                <span className="text-[12px] text-[rgba(181,179,179,1)]">
-                  /week
-                </span>
+                {formatPrice(price)}
               </div>
             )}
             <CollapsibleTrigger className="p-1">
@@ -71,7 +84,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 
         <CollapsibleContent className="px-3 pb-5">
           <div className="flex w-full max-w-full flex-col items-stretch">
-            <p className="text-black text-sm font-normal leading-[23px] font-nunito">
+            <p className="text-black text-sm font-normal leading-[23px] font-nunito-sans">
               LTD Insurance protects your ability to earn an income with benefits
               that can be paid up to your normal retirement age. With Guaranteed
               Issue, you're enrolled as soon as you sign up.
@@ -105,20 +118,17 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
           />
           <div className="flex flex-col items-stretch mt-1.5">
-            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito">
+            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700]">
               {title}
             </h3>
-            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito">
+            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito-sans font-[400]">
               {description}
             </p>
           </div>
         </div>
         {price && (
           <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] text-right">
-            {price.split("/")[0]}
-            <span className="text-[12px] text-[rgba(181,179,179,1)]">
-              {`/${price.split("/")[1]}`}
-            </span>
+            {formatPrice(price)}
           </div>
         )}
       </article>
@@ -138,20 +148,17 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
           />
           <div className="flex flex-col items-stretch mt-1.5">
-            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito">
+            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700]">
               {title}
             </h3>
-            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito">
+            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito-sans font-[400]">
               {description}
             </p>
           </div>
         </div>
         {price && (
           <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] text-right">
-            {price.split("/")[0]}
-            <span className="text-[12px] text-[rgba(181,179,179,1)]">
-              {`/${price.split("/")[1]}`}
-            </span>
+            {formatPrice(price)}
           </div>
         )}
       </article>
@@ -164,21 +171,16 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       className={`bg-white flex gap-5 justify-between px-[70px] py-[21px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className}`}
     >
       <div className="mt-1">
-        <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none max-md:mr-[5px] font-nunito">
+        <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none max-md:mr-[5px] font-nunito-sans font-[700]">
           {title}
         </h3>
-        <p className="text-[#6C757D] text-xs font-normal capitalize mt-[11px] font-nunito">
+        <p className="text-[#6C757D] text-xs font-normal capitalize mt-[11px] font-nunito-sans font-[400]">
           {description}
         </p>
       </div>
       {price && (
         <div className="text-black text-lg font-extrabold leading-[22px] text-right">
-          <span className="font-[900] text-[rgba(102,112,133,1)]">
-            {price.split("/")[0]}
-          </span>
-          <span className="text-[12px] text-[rgba(181,179,179,1)]">
-            {`/${price.split("/")[1]}`}
-          </span>
+          {formatPrice(price)}
         </div>
       )}
     </article>

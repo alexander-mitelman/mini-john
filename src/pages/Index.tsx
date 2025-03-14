@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import {
   InsuranceHeader,
   UserInfoCard,
@@ -8,54 +9,139 @@ import {
   CTAButton,
   EditUserInfoDialog,
 } from "@/components/insurance";
+import { UserInfo, InsuranceProducts, fetchAllProducts, fetchProductUpdates } from "@/utils/insuranceApi";
 
 const Index = () => {
-  const [userInfo, setUserInfo] = useState({
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // User information state
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     age: 46,
     zipCode: "070730",
     income: "$200,000",
+    annualSalary: 200000,
   });
   
+  // Dialog states
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [focusField, setFocusField] = useState<'age' | 'zipCode' | 'income' | undefined>(undefined);
 
+  // Insurance products state
+  const [products, setProducts] = useState<InsuranceProducts>({
+    ltd: { price: "$28.21/week", weeklyPrice: 28.21, features: [] },
+    std: { price: "$30.00/week", weeklyPrice: 30.00 },
+    life: { price: "$3.60/week", weeklyPrice: 3.60 },
+    accident: { price: "$11.74/week", weeklyPrice: 11.74 },
+    dental: { price: "$34.51/week", weeklyPrice: 34.51 },
+    vision: { price: "$9.48/week", weeklyPrice: 9.48 },
+  });
+
+  // Total weekly price calculation
+  const totalWeeklyPrice = Object.values(products)
+    .reduce((sum, product) => sum + (product.weeklyPrice || 0), 0)
+    .toFixed(2);
+
+  // Hours of work calculation based on income
+  const calculateHoursOfWork = () => {
+    const annualIncome = parseInt(userInfo.income.replace(/\$|,/g, ''));
+    const hourlyRate = annualIncome / 2080; // 40 hours * 52 weeks
+    const weeklyPrice = parseFloat(totalWeeklyPrice);
+    return (weeklyPrice / hourlyRate).toFixed(1);
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    const initializeProducts = async () => {
+      try {
+        setIsLoading(true);
+        const allProducts = await fetchAllProducts(userInfo);
+        setProducts(allProducts);
+      } catch (error) {
+        console.error("Failed to fetch initial products:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load insurance products.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeProducts();
+  }, []);
+
+  // Handle edit user info dialog
   const handleEditUserInfo = (field?: 'age' | 'zipCode' | 'income') => {
     setFocusField(field);
     setIsEditDialogOpen(true);
   };
   
-  const handleUserInfoSubmit = (updatedInfo: {
-    age: number;
-    zipCode: string;
-    income: string;
-  }) => {
+  // Handle user info submission and fetch updated product prices
+  const handleUserInfoSubmit = async (updatedInfo: UserInfo) => {
+    const previousInfo = { ...userInfo };
     setUserInfo(updatedInfo);
     setIsEditDialogOpen(false);
+    
+    // Determine which fields have changed
+    const changedFields: string[] = [];
+    if (updatedInfo.age !== previousInfo.age) changedFields.push('age');
+    if (updatedInfo.zipCode !== previousInfo.zipCode) changedFields.push('zipCode');
+    
+    // Check if income has changed and calculate annualSalary
+    const previousIncome = parseInt(previousInfo.income.replace(/\$|,/g, ''));
+    const newIncome = parseInt(updatedInfo.income.replace(/\$|,/g, ''));
+    if (previousIncome !== newIncome) {
+      changedFields.push('income');
+      changedFields.push('annualSalary');
+      updatedInfo.annualSalary = newIncome;
+    }
+    
+    if (changedFields.length > 0) {
+      try {
+        setIsLoading(true);
+        toast({
+          title: "Updating prices",
+          description: "Recalculating your insurance quotes based on new information.",
+        });
+        
+        // Fetch updated products based on changed fields
+        const updatedProducts = await fetchProductUpdates(updatedInfo, changedFields);
+        
+        // Update products state with the new values
+        setProducts(prevProducts => ({
+          ...prevProducts,
+          ...updatedProducts,
+        }));
+        
+        toast({
+          title: "Prices updated",
+          description: "Your insurance quotes have been updated.",
+        });
+      } catch (error) {
+        console.error("Failed to update products:", error);
+        toast({
+          title: "Error",
+          description: "Failed to update insurance products.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   const handleGetQuote = () => {
     // In a real app, this would navigate to the quote page
     console.log("Get quote clicked");
+    toast({
+      title: "Quote requested",
+      description: "Your personalized quote is being prepared.",
+    });
   };
 
-  const longTermDisabilityFeatures = [
-    {
-      icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/1a8ce5d1400d6d9ddccb3d7b44ef7987bef61e346c61dca4d08743b45201c135?placeholderIfAbsent=true",
-      text: "Up to $10,000 of monthly benefit",
-    },
-    {
-      icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/17bc3e1790425a777f677b9f946a429aaeaa56d6832a85e738e1bcf9081b4630?placeholderIfAbsent=true",
-      text: "Benefit paid up to normal retirement age",
-    },
-    {
-      icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/aa0461f3a5d51685647cbc8959d7e56a49174f4f6c8e6a89f18e754bc9cbfadf?placeholderIfAbsent=true",
-      text: "Guaranteed Issue enrollment",
-    },
-    {
-      icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/f808076e963d98f94ed4a29b59a6571600739a0cafefc0673ad2821f3917e34a?placeholderIfAbsent=true",
-      text: "Income protection for extended illnesses",
-    },
-  ];
+  const longTermDisabilityFeatures = products.ltd.features || [];
 
   return (
     <main className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto px-[60px] py-[81px] max-md:px-5">
@@ -81,72 +167,86 @@ const Index = () => {
         focusField={focusField}
       />
 
-      <div className="mt-2">
-        <InsurancePlanCard
-          title="Long Term Disability"
-          description="Protect your income when you need it most"
-          isExpanded={false}
-          features={longTermDisabilityFeatures}
-        />
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-pulse text-center text-gray-500">
+            Loading insurance options...
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="mt-2">
+            <InsurancePlanCard
+              title="Long Term Disability"
+              description="Protect your income when you need it most"
+              price={products.ltd.price}
+              isExpanded={false}
+              features={longTermDisabilityFeatures}
+            />
+          </div>
 
-      <div className="mt-2.5">
-        <InsurancePlanCard
-          title="Short-term Disability"
-          description="Protect your income when you need it most"
-          price="$30.00/week"
-        />
-      </div>
+          <div className="mt-2.5">
+            <InsurancePlanCard
+              title="Short-term Disability"
+              description="Protect your income when you need it most"
+              price={products.std.price}
+            />
+          </div>
 
-      <div className="mt-4">
-        <InsurancePlanCard
-          title="Life Insurance"
-          description="Financial protection for your loved ones"
-          price="$3.60/week"
-          icon="https://cdn.builder.io/api/v1/image/assets/TEMP/5f9c57b11ebaa7eadf51a69256cff48f2f948c6626ed844068459f36c7c8202b?placeholderIfAbsent=true"
-        />
-      </div>
+          <div className="mt-4">
+            <InsurancePlanCard
+              title="Life Insurance"
+              description="Financial protection for your loved ones"
+              price={products.life.price}
+              icon="https://cdn.builder.io/api/v1/image/assets/TEMP/5f9c57b11ebaa7eadf51a69256cff48f2f948c6626ed844068459f36c7c8202b?placeholderIfAbsent=true"
+            />
+          </div>
 
-      <div className="mt-4">
-        <InsurancePlanCard
-          title="Dental"
-          description="Coverage for routine dental care and procedures"
-          price="$34.51/week"
-          icon="https://cdn.builder.io/api/v1/image/assets/TEMP/4c06ccf7d2f8aefefb4333aaca45e934f2f147688a0d3ac41633515a9a80897c?placeholderIfAbsent=true"
-          className="flex w-full items-stretch gap-5 justify-between px-[11px] py-[21px]"
-        />
-      </div>
+          <div className="mt-4">
+            <InsurancePlanCard
+              title="Dental"
+              description="Coverage for routine dental care and procedures"
+              price={products.dental.price}
+              icon="https://cdn.builder.io/api/v1/image/assets/TEMP/4c06ccf7d2f8aefefb4333aaca45e934f2f147688a0d3ac41633515a9a80897c?placeholderIfAbsent=true"
+              className="flex w-full items-stretch gap-5 justify-between px-[11px] py-[21px]"
+            />
+          </div>
 
-      <div className="mt-4">
-        <InsurancePlanCard
-          title="Vision"
-          description="Coverage for eye exams and vision correction"
-          price="$9.48/week"
-          icon="https://cdn.builder.io/api/v1/image/assets/TEMP/0bbf0b198321af45e362d12ca231b34a03288994a5e4eb7382e767e586308d22?placeholderIfAbsent=true"
-          className="flex w-full items-stretch gap-5 justify-between px-3 py-[22px]"
-        />
-      </div>
+          <div className="mt-4">
+            <InsurancePlanCard
+              title="Vision"
+              description="Coverage for eye exams and vision correction"
+              price={products.vision.price}
+              icon="https://cdn.builder.io/api/v1/image/assets/TEMP/0bbf0b198321af45e362d12ca231b34a03288994a5e4eb7382e767e586308d22?placeholderIfAbsent=true"
+              className="flex w-full items-stretch gap-5 justify-between px-3 py-[22px]"
+            />
+          </div>
 
-      <div className="mt-4">
-        <InsurancePlanCard
-          title="Accident"
-          description="Financial help if you experience a covered accident"
-          price="$11.74/week"
-          icon="https://cdn.builder.io/api/v1/image/assets/TEMP/1d6e8727f71bc0136354086a0262a101904e839fe1987b76d93802397374cd47?placeholderIfAbsent=true"
-          className="flex gap-5 justify-between px-3.5 py-[22px]"
-        />
-      </div>
+          <div className="mt-4">
+            <InsurancePlanCard
+              title="Accident"
+              description="Financial help if you experience a covered accident"
+              price={products.accident.price}
+              icon="https://cdn.builder.io/api/v1/image/assets/TEMP/1d6e8727f71bc0136354086a0262a101904e839fe1987b76d93802397374cd47?placeholderIfAbsent=true"
+              className="flex gap-5 justify-between px-3.5 py-[22px]"
+            />
+          </div>
 
-      <div className="mt-2">
-        <InsuranceSummary weeklyPrice="$34.70" hoursOfWork="1.4" />
-      </div>
+          <div className="mt-2">
+            <InsuranceSummary 
+              weeklyPrice={`$${totalWeeklyPrice}`} 
+              hoursOfWork={calculateHoursOfWork()} 
+            />
+          </div>
 
-      <div className="mt-3.5">
-        <CTAButton
-          text="Get Your Personalized Quote"
-          onClick={handleGetQuote}
-        />
-      </div>
+          <div className="mt-3.5">
+            <CTAButton
+              text="Get Your Personalized Quote"
+              onClick={handleGetQuote}
+            />
+          </div>
+        </>
+      )}
     </main>
   );
 };

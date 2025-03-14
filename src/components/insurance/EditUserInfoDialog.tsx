@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -57,9 +58,20 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
     defaultValues: {
       age: initialValues.age,
       zipCode: initialValues.zipCode,
-      income: initialValues.income.replace("$", "").replace(",", ""),
+      income: initialValues.income.replace(/\$|,/g, ""),
     },
   });
+
+  // Reset form when initialValues change
+  useEffect(() => {
+    if (isOpen) {
+      form.reset({
+        age: initialValues.age,
+        zipCode: initialValues.zipCode,
+        income: initialValues.income.replace(/\$|,/g, ""),
+      });
+    }
+  }, [initialValues, isOpen, form]);
 
   // Focus the appropriate field when the dialog opens
   useEffect(() => {
@@ -83,7 +95,6 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
       ...values,
       income: formattedIncome,
     });
-    onClose();
   };
 
   return (
@@ -91,6 +102,9 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-[rgba(67,83,255,1)]">Edit Your Information</DialogTitle>
+          <DialogDescription className="text-[#6C757D]">
+            Update your personal details to get accurate insurance quotes.
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">

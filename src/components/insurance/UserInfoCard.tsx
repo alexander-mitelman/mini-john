@@ -28,7 +28,7 @@ export const UserInfoCard: React.FC<UserInfoCardProps> = ({
       </div>
       <div className="flex-grow">
         <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-[rgba(67,83,255,1)] font-bold">Your Information</div>
+          <div className="text-sm text-[rgba(67,83,255,1)] font-bold font-nunito-sans">Your Information</div>
           <button
             onClick={() => onEdit()}
             className="text-[10px] text-[rgba(67,83,255,1)] whitespace-nowrap underline p-1 rounded-lg"
