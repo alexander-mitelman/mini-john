@@ -1,4 +1,3 @@
-
 // Define base types for our API
 export interface UserInfo {
   age: number;
@@ -8,6 +7,8 @@ export interface UserInfo {
   employeeCoverage?: number;
   spouseCoverage?: number;
 }
+
+export type IndividualInfo = UserInfo;
 
 export interface ProductResponse {
   price: string;
