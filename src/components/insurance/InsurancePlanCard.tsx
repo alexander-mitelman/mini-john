@@ -60,53 +60,62 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         onOpenChange={setIsExpanded}
         className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""}`}
       >
-        {/* Title at the top */}
-        <div className="px-3.5 pt-4 pb-2">
-          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-            {title}
-          </h3>
-        </div>
-        
-        {/* Main row with description, icon, price, switch, info button */}
-        <div className="flex w-full px-3.5 py-3 items-center">
-          <img
-            src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
-            alt="Long Term Disability icon"
-            className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
-          />
-          
-          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
-          
-          <div className="flex items-center gap-3 shrink-0">
-            {!isExpanded && price && formatPrice(price)}
-            
-            <div className="flex items-center">
-              <Switch 
-                checked={enabled}
-                onCheckedChange={(checked) => onToggle && onToggle(checked)}
-              />
+        {/* Card layout with dedicated icon column */}
+        <div className="flex w-full">
+          {/* Icon column */}
+          <div className="flex-shrink-0 py-4 pl-3.5 pr-2">
+            <img
+              src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
+              alt="Long Term Disability icon"
+              className="w-10 h-10 object-contain"
+            />
+          </div>
+
+          {/* Content column */}
+          <div className="flex-grow flex flex-col">
+            {/* Title at the top */}
+            <div className="pt-4 pb-2">
+              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+                {title}
+              </h3>
             </div>
             
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <CollapsibleTrigger className="p-2 rounded-full bg-[rgba(67,83,255,0.1)] text-[rgba(67,83,255,1)] hover:bg-[rgba(67,83,255,0.2)] transition-colors">
-                    {isExpanded ? (
-                      <ChevronUp className="h-5 w-5" />
-                    ) : (
-                      <div className="flex items-center">
-                        <Info className="h-5 w-5" />
-                      </div>
-                    )}
-                  </CollapsibleTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  <p>{isExpanded ? "Show less" : "View more details"}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {/* Description and controls */}
+            <div className="flex w-full pr-3.5 pb-3 items-center">
+              <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+                {description}
+              </p>
+              
+              <div className="flex items-center gap-3 shrink-0">
+                {!isExpanded && price && formatPrice(price)}
+                
+                <div className="flex items-center">
+                  <Switch 
+                    checked={enabled}
+                    onCheckedChange={(checked) => onToggle && onToggle(checked)}
+                  />
+                </div>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <CollapsibleTrigger className="p-2 rounded-full bg-[rgba(67,83,255,0.1)] text-[rgba(67,83,255,1)] hover:bg-[rgba(67,83,255,0.2)] transition-colors">
+                        {isExpanded ? (
+                          <ChevronUp className="h-5 w-5" />
+                        ) : (
+                          <div className="flex items-center">
+                            <Info className="h-5 w-5" />
+                          </div>
+                        )}
+                      </CollapsibleTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>{isExpanded ? "Show less" : "View more details"}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -137,35 +146,43 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (title === "Short-term Disability") {
     return (
       <article
-        className={`bg-white flex flex-col px-3.5 py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        {/* Title at the top */}
-        <div className="pb-2">
-          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-            {title}
-          </h3>
-        </div>
-        
-        {/* Main row with description, icon, price, switch */}
-        <div className="flex items-center">
-          <img
-            src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
-            alt={`${title} icon`}
-            className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
-          />
-          
-          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
-          
-          <div className="flex items-center gap-3 shrink-0">
-            {price && formatPrice(price)}
+        <div className="flex w-full">
+          {/* Icon column */}
+          <div className="flex-shrink-0 py-3 pl-3.5 pr-2">
+            <img
+              src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
+              alt={`${title} icon`}
+              className="w-10 h-10 object-contain"
+            />
+          </div>
+
+          {/* Content column */}
+          <div className="flex-grow flex flex-col pr-3.5">
+            {/* Title at the top */}
+            <div className="pt-3 pb-2">
+              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+                {title}
+              </h3>
+            </div>
             
-            <div className="flex items-center">
-              <Switch 
-                checked={enabled}
-                onCheckedChange={(checked) => onToggle && onToggle(checked)}
-              />
+            {/* Description and controls */}
+            <div className="flex w-full items-center pb-3">
+              <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+                {description}
+              </p>
+              
+              <div className="flex items-center gap-3 shrink-0">
+                {price && formatPrice(price)}
+                
+                <div className="flex items-center">
+                  <Switch 
+                    checked={enabled}
+                    onCheckedChange={(checked) => onToggle && onToggle(checked)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -177,35 +194,43 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (icon) {
     return (
       <article
-        className={`bg-white flex flex-col px-3.5 py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        {/* Title at the top */}
-        <div className="pb-2">
-          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-            {title}
-          </h3>
-        </div>
-        
-        {/* Main row with description, icon, price, switch */}
-        <div className="flex items-center">
-          <img
-            src={icon}
-            alt={`${title} icon`}
-            className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
-          />
-          
-          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
-          
-          <div className="flex items-center gap-3 shrink-0">
-            {price && formatPrice(price)}
+        <div className="flex w-full">
+          {/* Icon column */}
+          <div className="flex-shrink-0 py-3 pl-3.5 pr-2">
+            <img
+              src={icon}
+              alt={`${title} icon`}
+              className="w-10 h-10 object-contain"
+            />
+          </div>
+
+          {/* Content column */}
+          <div className="flex-grow flex flex-col pr-3.5">
+            {/* Title at the top */}
+            <div className="pt-3 pb-2">
+              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+                {title}
+              </h3>
+            </div>
             
-            <div className="flex items-center">
-              <Switch 
-                checked={enabled}
-                onCheckedChange={(checked) => onToggle && onToggle(checked)}
-              />
+            {/* Description and controls */}
+            <div className="flex w-full items-center pb-3">
+              <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+                {description}
+              </p>
+              
+              <div className="flex items-center gap-3 shrink-0">
+                {price && formatPrice(price)}
+                
+                <div className="flex items-center">
+                  <Switch 
+                    checked={enabled}
+                    onCheckedChange={(checked) => onToggle && onToggle(checked)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
