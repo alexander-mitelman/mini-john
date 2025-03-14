@@ -77,18 +77,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           </div>
           
           <div className="flex items-center gap-3">
+            {!isExpanded && price && (
+              <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
+                {formatPrice(price)}
+              </div>
+            )}
+            
             <div className="flex items-center">
               <Switch 
                 checked={enabled}
                 onCheckedChange={(checked) => onToggle && onToggle(checked)}
               />
             </div>
-            
-            {!isExpanded && price && (
-              <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
-                {formatPrice(price)}
-              </div>
-            )}
             
             <CollapsibleTrigger className="p-1">
               <ChevronDown className={`h-5 w-5 transition-transform ${isExpanded ? "transform rotate-180" : ""}`} />
@@ -142,18 +142,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         </div>
         
         <div className="flex items-center gap-3">
+          {price && (
+            <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
+              {formatPrice(price)}
+            </div>
+          )}
+          
           <div className="flex items-center">
             <Switch 
               checked={enabled}
               onCheckedChange={(checked) => onToggle && onToggle(checked)}
             />
           </div>
-          
-          {price && (
-            <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
-              {formatPrice(price)}
-            </div>
-          )}
         </div>
       </article>
     );
@@ -182,18 +182,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         </div>
         
         <div className="flex items-center gap-3">
+          {price && (
+            <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
+              {formatPrice(price)}
+            </div>
+          )}
+          
           <div className="flex items-center">
             <Switch 
               checked={enabled}
               onCheckedChange={(checked) => onToggle && onToggle(checked)}
             />
           </div>
-          
-          {price && (
-            <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
-              {formatPrice(price)}
-            </div>
-          )}
         </div>
       </article>
     );
@@ -214,18 +214,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       </div>
       
       <div className="flex items-center gap-3">
+        {price && (
+          <div className="text-black text-lg font-extrabold leading-[22px] whitespace-nowrap">
+            {formatPrice(price)}
+          </div>
+        )}
+        
         <div className="flex items-center">
           <Switch 
             checked={enabled}
             onCheckedChange={(checked) => onToggle && onToggle(checked)}
           />
         </div>
-        
-        {price && (
-          <div className="text-black text-lg font-extrabold leading-[22px] whitespace-nowrap">
-            {formatPrice(price)}
-          </div>
-        )}
       </div>
     </article>
   );
