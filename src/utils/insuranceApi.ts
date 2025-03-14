@@ -1,3 +1,4 @@
+
 // Define base types for our API
 export interface UserInfo {
   age: number;
@@ -29,35 +30,44 @@ export interface InsuranceProducts {
   critical?: ProductResponse;
 }
 
+// Define the product trigger interface
+export interface ProductTriggers {
+  age?: boolean;
+  annualSalary?: boolean;
+  zipCode?: boolean;
+  employeeCoverage?: boolean;
+  spouseCoverage?: boolean;
+}
+
 // Product configuration with triggers and URL builders
 export const productConfig = {
   ltd: {
-    triggers: { annualSalary: true },
+    triggers: { annualSalary: true } as ProductTriggers,
     buildUrl: ({ annualSalary }: UserInfo) => `/ltd/?salary=${annualSalary}`
   },
   std: {
-    triggers: { annualSalary: true, age: true },
+    triggers: { annualSalary: true, age: true } as ProductTriggers,
     buildUrl: ({ annualSalary, age }: UserInfo) => `/std/?salary=${annualSalary}&age=${age}`
   },
   life: {
-    triggers: { age: true, employeeCoverage: true, spouseCoverage: true },
+    triggers: { age: true, employeeCoverage: true, spouseCoverage: true } as ProductTriggers,
     buildUrl: ({ age, employeeCoverage, spouseCoverage }: UserInfo) => 
       `/life/?age=${age}&employeeCoverage=${employeeCoverage}&spouseCoverage=${spouseCoverage}`
   },
   accident: {
-    triggers: { annualSalary: true, age: true, zipCode: true, employeeCoverage: true, spouseCoverage: true },
+    triggers: { annualSalary: true, age: true, zipCode: true, employeeCoverage: true, spouseCoverage: true } as ProductTriggers,
     buildUrl: () => `/accident`
   },
   dental: {
-    triggers: { zipCode: true },
+    triggers: { zipCode: true } as ProductTriggers,
     buildUrl: ({ zipCode }: UserInfo) => `/dental/?zipCode=${zipCode}`
   },
   vision: {
-    triggers: { zipCode: true },
+    triggers: { zipCode: true } as ProductTriggers,
     buildUrl: ({ zipCode }: UserInfo) => `/vision/?zipCode=${zipCode}`
   },
   critical: {
-    triggers: { age: true },
+    triggers: { age: true } as ProductTriggers,
     buildUrl: ({ age }: UserInfo) => `/critical/?age=${age}`
   },
 };

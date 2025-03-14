@@ -15,6 +15,15 @@ interface ProductQuotes {
   critical: any | null;
 }
 
+// Define a proper interface for the triggers
+interface ProductTriggers {
+  age?: boolean;
+  annualSalary?: boolean;
+  zipCode?: boolean;
+  employeeCoverage?: boolean;
+  spouseCoverage?: boolean;
+}
+
 /**
  * Hook for managing insurance quotes
  * Fetches and updates quotes based on changes to user information
@@ -131,7 +140,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
     // For each product, check if any triggers changed
     for (const product of Object.keys(productConfig)) {
-      const triggers = productConfig[product as keyof typeof productConfig].triggers;
+      const triggers = productConfig[product as keyof typeof productConfig].triggers as ProductTriggers;
       
       // Check if any of the triggers match the changed fields
       let needsFetch = false;
