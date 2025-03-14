@@ -1,3 +1,4 @@
+
 import React from "react";
 
 interface InsurancePlanFeatureProps {
@@ -18,7 +19,7 @@ export const InsurancePlanFeature: React.FC<InsurancePlanFeatureProps> = ({
       <img
         src={icon}
         alt="Feature icon"
-        className="aspect-[1] object-contain w-[23px] self-stretch shrink-0 my-auto"
+        className="aspect-[1] object-contain w-[23px] h-[23px] self-stretch shrink-0 my-auto"
       />
       <div className="self-stretch my-auto">{text}</div>
     </div>

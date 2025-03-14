@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -150,13 +149,13 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               Issue, you're enrolled as soon as you sign up.
             </p>
             
-            <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] font-bold text-center leading-loose mt-2 ${!enabled ? "opacity-50" : ""}`}>
+            <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] mt-2 ${!enabled ? "opacity-50" : ""}`}>
               {features.map((feature, index) => (
                 <InsurancePlanFeature
                   key={index}
                   icon={feature.icon}
                   text={feature.text}
-                  className={index === 2 ? "text-zinc-600" : ""}
+                  className="font-medium"
                 />
               ))}
             </div>
