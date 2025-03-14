@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   InsuranceHeader,
@@ -5,6 +6,7 @@ import {
   InsurancePlanCard,
   InsuranceSummary,
   CTAButton,
+  EditUserInfoDialog,
 } from "@/components/insurance";
 
 const Index = () => {
@@ -13,10 +15,20 @@ const Index = () => {
     zipCode: "070730",
     income: "$200,000",
   });
+  
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleEditUserInfo = () => {
-    // In a real app, this would open a form or modal
-    console.log("Edit user info clicked");
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleUserInfoSubmit = (updatedInfo: {
+    age: number;
+    zipCode: string;
+    income: string;
+  }) => {
+    setUserInfo(updatedInfo);
+    setIsEditDialogOpen(false);
   };
 
   const handleGetQuote = () => {
@@ -58,6 +70,13 @@ const Index = () => {
           onEdit={handleEditUserInfo}
         />
       </div>
+
+      <EditUserInfoDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        initialValues={userInfo}
+        onSubmit={handleUserInfoSubmit}
+      />
 
       <div className="mt-2">
         <InsurancePlanCard
