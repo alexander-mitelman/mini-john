@@ -37,9 +37,37 @@ const Index = () => {
     vision: { price: "$9.48/week", weeklyPrice: 9.48 },
   });
 
-  // Total weekly price calculation
-  const totalWeeklyPrice = Object.values(products)
-    .reduce((sum, product) => sum + (product.weeklyPrice || 0), 0)
+  // Track which products are enabled
+  const [enabledProducts, setEnabledProducts] = useState<Record<string, boolean>>({
+    ltd: true,
+    std: true,
+    life: true,
+    accident: true,
+    dental: true,
+    vision: true,
+  });
+
+  // Handle toggling a product on/off
+  const handleToggleProduct = (product: string, enabled: boolean) => {
+    setEnabledProducts(prev => ({
+      ...prev,
+      [product]: enabled
+    }));
+    
+    toast({
+      title: enabled ? "Product added" : "Product removed",
+      description: `${product.toUpperCase()} insurance has been ${enabled ? "added to" : "removed from"} your plan.`,
+    });
+  };
+
+  // Total weekly price calculation (only for enabled products)
+  const totalWeeklyPrice = Object.entries(products)
+    .reduce((sum, [key, product]) => {
+      if (enabledProducts[key]) {
+        return sum + (product.weeklyPrice || 0);
+      }
+      return sum;
+    }, 0)
     .toFixed(2);
 
   // Hours of work calculation based on income
@@ -182,6 +210,8 @@ const Index = () => {
               price={products.ltd.price}
               isExpanded={false}
               features={longTermDisabilityFeatures}
+              enabled={enabledProducts.ltd}
+              onToggle={(enabled) => handleToggleProduct('ltd', enabled)}
             />
           </div>
 
@@ -190,6 +220,8 @@ const Index = () => {
               title="Short-term Disability"
               description="Protect your income when you need it most"
               price={products.std.price}
+              enabled={enabledProducts.std}
+              onToggle={(enabled) => handleToggleProduct('std', enabled)}
             />
           </div>
 
@@ -199,6 +231,8 @@ const Index = () => {
               description="Financial protection for your loved ones"
               price={products.life.price}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/5f9c57b11ebaa7eadf51a69256cff48f2f948c6626ed844068459f36c7c8202b?placeholderIfAbsent=true"
+              enabled={enabledProducts.life}
+              onToggle={(enabled) => handleToggleProduct('life', enabled)}
             />
           </div>
 
@@ -209,6 +243,8 @@ const Index = () => {
               price={products.dental.price}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/4c06ccf7d2f8aefefb4333aaca45e934f2f147688a0d3ac41633515a9a80897c?placeholderIfAbsent=true"
               className="flex w-full items-stretch gap-5 justify-between px-[11px] py-[21px]"
+              enabled={enabledProducts.dental}
+              onToggle={(enabled) => handleToggleProduct('dental', enabled)}
             />
           </div>
 
@@ -219,6 +255,8 @@ const Index = () => {
               price={products.vision.price}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/0bbf0b198321af45e362d12ca231b34a03288994a5e4eb7382e767e586308d22?placeholderIfAbsent=true"
               className="flex w-full items-stretch gap-5 justify-between px-3 py-[22px]"
+              enabled={enabledProducts.vision}
+              onToggle={(enabled) => handleToggleProduct('vision', enabled)}
             />
           </div>
 
@@ -229,6 +267,8 @@ const Index = () => {
               price={products.accident.price}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/1d6e8727f71bc0136354086a0262a101904e839fe1987b76d93802397374cd47?placeholderIfAbsent=true"
               className="flex gap-5 justify-between px-3.5 py-[22px]"
+              enabled={enabledProducts.accident}
+              onToggle={(enabled) => handleToggleProduct('accident', enabled)}
             />
           </div>
 
