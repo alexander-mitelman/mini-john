@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, Info } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -107,24 +107,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
                   />
                 </div>
                 
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <CollapsibleTrigger className="p-2 rounded-full bg-[rgba(67,83,255,0.1)] text-[rgba(67,83,255,1)] hover:bg-[rgba(67,83,255,0.2)] transition-colors">
-                        {isExpanded ? (
-                          <ChevronUp className="h-5 w-5" />
-                        ) : (
-                          <div className="flex items-center">
-                            <Info className="h-5 w-5" />
-                          </div>
-                        )}
-                      </CollapsibleTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      <p>{isExpanded ? "Show less" : "View more details"}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {/* Info icon removed */}
               </div>
             </div>
           </div>
@@ -282,4 +265,3 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     </article>
   );
 };
-
