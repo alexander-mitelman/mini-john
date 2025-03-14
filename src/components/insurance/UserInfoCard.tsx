@@ -37,31 +37,31 @@ export const UserInfoCard: React.FC<UserInfoCardProps> = ({
           <div>
             <div 
               onClick={() => onEdit('age')}
-              className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-3 py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+              className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border flex items-center justify-center min-h-[29px] px-2 py-1 rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
             >
-              <span className="text-[9px] text-[rgba(102,112,133,1)]">Age</span>{" "}
-              {age}
+              <span className="text-[9px] text-[rgba(102,112,133,1)] mr-1">Age</span>
+              <span>{age}</span>
             </div>
           </div>
           <div className="flex flex-col items-stretch justify-center">
             <div 
               onClick={() => onEdit('zipCode')}
-              className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+              className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border flex items-center justify-center min-h-[29px] px-2 py-1 rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
             >
-              <span className="text-[9px] text-[rgba(102,112,133,1)]">
+              <span className="text-[9px] text-[rgba(102,112,133,1)] mr-1">
                 ZipCode
-              </span>{" "}
-              {zipCode}
+              </span>
+              <span>{zipCode}</span>
             </div>
           </div>
           <div 
             onClick={() => onEdit('income')}
-            className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+            className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border flex items-center justify-center min-h-[29px] px-2 py-1 rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
           >
-            <span className="text-[9px] text-[rgba(102,112,133,1)]">
+            <span className="text-[9px] text-[rgba(102,112,133,1)] mr-1">
               Income
-            </span>{" "}
-            {income}
+            </span>
+            <span>{income}</span>
           </div>
         </div>
       </div>
