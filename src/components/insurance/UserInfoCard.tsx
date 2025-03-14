@@ -1,3 +1,4 @@
+
 import React from "react";
 
 interface UserInfoCardProps {
@@ -34,20 +35,29 @@ export const UserInfoCard: React.FC<UserInfoCardProps> = ({
         </div>
         <div className="flex gap-[7px] text-[10px] text-black font-semibold text-center leading-[3] justify-center mt-3">
           <div>
-            <div className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-3 py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid">
+            <div 
+              onClick={onEdit}
+              className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-3 py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+            >
               <span className="text-[9px] text-[rgba(102,112,133,1)]">Age</span>{" "}
               {age}
             </div>
           </div>
           <div className="flex flex-col items-stretch justify-center">
-            <div className="self-stretch bg-white border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(0,0,0,0.2)] border-solid">
+            <div 
+              onClick={onEdit}
+              className="self-stretch bg-white border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(0,0,0,0.2)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+            >
               <span className="text-[9px] text-[rgba(102,112,133,1)]">
                 ZipCode
               </span>{" "}
               {zipCode}
             </div>
           </div>
-          <div className="self-stretch bg-white border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(0,0,0,0.2)] border-solid">
+          <div 
+            onClick={onEdit}
+            className="self-stretch bg-white border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(0,0,0,0.2)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+          >
             <span className="text-[9px] text-[rgba(102,112,133,1)]">
               Income
             </span>{" "}
