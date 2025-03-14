@@ -86,7 +86,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           <div className="flex-grow flex flex-col">
             {/* Title at the top */}
             <div className="pt-4 pb-2">
-              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+              <h3 className={`${isExpanded ? "text-[#9b87f5]" : "text-[rgba(67,83,255,1)]"} text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
                 {title}
               </h3>
             </div>
@@ -282,3 +282,4 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     </article>
   );
 };
+
