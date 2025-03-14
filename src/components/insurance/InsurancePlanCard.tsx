@@ -60,24 +60,24 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         onOpenChange={setIsExpanded}
         className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""}`}
       >
-        <div className="flex w-full px-3.5 py-[19px] items-center">
-          <div className="flex gap-[15px] flex-1 max-w-[65%]">
+        <div className="flex w-full px-3.5 py-[19px] items-center justify-between">
+          <div className="flex gap-[15px] max-w-[60%]">
             <img
               src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
               alt="Long Term Disability icon"
               className="aspect-[0.76] object-contain w-[41px] self-start shrink-0"
             />
-            <div className="flex flex-col items-stretch">
+            <div className="flex flex-col min-w-0">
               <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
                 {title}
               </h3>
-              <p className={`text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito-sans font-[400] truncate ${!enabled ? "opacity-50" : ""}`}>
+              <p className={`text-[#6C757D] text-xs font-normal leading-loose mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
                 {description}
               </p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-3 shrink-0">
             {!isExpanded && price && (
               <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
                 {formatPrice(price)}
@@ -139,25 +139,25 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (title === "Short-term Disability") {
     return (
       <article
-        className={`bg-white flex gap-5 justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white flex justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        <div className="flex gap-[15px] flex-1 max-w-[65%]">
+        <div className="flex gap-[15px] max-w-[60%]">
           <img
             src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
             alt={`${title} icon`}
             className="aspect-[0.76] object-contain w-[41px] self-start shrink-0"
           />
-          <div className="flex flex-col items-stretch">
+          <div className="flex flex-col min-w-0">
             <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
               {title}
             </h3>
-            <p className={`text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito-sans font-[400] truncate ${!enabled ? "opacity-50" : ""}`}>
+            <p className={`text-[#6C757D] text-xs font-normal leading-loose mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
               {description}
             </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-3 shrink-0">
           {price && (
             <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
               {formatPrice(price)}
@@ -179,25 +179,25 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (icon) {
     return (
       <article
-        className={`bg-white flex gap-5 justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white flex justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        <div className="flex gap-[15px] flex-1 max-w-[65%]">
+        <div className="flex gap-[15px] max-w-[60%]">
           <img
             src={icon}
             alt={`${title} icon`}
             className="aspect-[0.76] object-contain w-[41px] self-start shrink-0"
           />
-          <div className="flex flex-col items-stretch">
+          <div className="flex flex-col min-w-0">
             <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
               {title}
             </h3>
-            <p className={`text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito-sans font-[400] truncate ${!enabled ? "opacity-50" : ""}`}>
+            <p className={`text-[#6C757D] text-xs font-normal leading-loose mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
               {description}
             </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-3 ml-auto">
+        <div className="flex items-center gap-3 shrink-0">
           {price && (
             <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
               {formatPrice(price)}
@@ -218,18 +218,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   // Compact version without icon
   return (
     <article
-      className={`bg-white flex gap-5 justify-between px-[70px] py-[21px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className} ${!enabled ? "opacity-70" : ""}`}
+      className={`bg-white flex justify-between px-[70px] py-[21px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className} ${!enabled ? "opacity-70" : ""}`}
     >
-      <div className="mt-1 flex-1 max-w-[65%]">
+      <div className="mt-1 max-w-[60%] min-w-0">
         <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none max-md:mr-[5px] font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
           {title}
         </h3>
-        <p className={`text-[#6C757D] text-xs font-normal capitalize mt-[11px] font-nunito-sans font-[400] truncate ${!enabled ? "opacity-50" : ""}`}>
+        <p className={`text-[#6C757D] text-xs font-normal mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
           {description}
         </p>
       </div>
       
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-3 shrink-0">
         {price && (
           <div className="text-black text-lg font-extrabold leading-[22px] whitespace-nowrap">
             {formatPrice(price)}
