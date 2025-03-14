@@ -62,8 +62,8 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       >
         {/* Card layout with dedicated icon column */}
         <div className="flex w-full">
-          {/* Icon column */}
-          <div className="flex-shrink-0 py-4 pl-3.5 pr-2">
+          {/* Icon column - centered vertically and horizontally */}
+          <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
             <img
               src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
               alt="Long Term Disability icon"
@@ -149,8 +149,8 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         className={`bg-white rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
         <div className="flex w-full">
-          {/* Icon column */}
-          <div className="flex-shrink-0 py-3 pl-3.5 pr-2">
+          {/* Icon column - centered vertically and horizontally */}
+          <div className="flex-shrink-0 flex items-center justify-center py-3 pl-3.5 pr-2">
             <img
               src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
               alt={`${title} icon`}
@@ -197,8 +197,8 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         className={`bg-white rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
         <div className="flex w-full">
-          {/* Icon column */}
-          <div className="flex-shrink-0 py-3 pl-3.5 pr-2">
+          {/* Icon column - centered vertically and horizontally */}
+          <div className="flex-shrink-0 flex items-center justify-center py-3 pl-3.5 pr-2">
             <img
               src={icon}
               alt={`${title} icon`}
