@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronUp, Info } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Feature {
   icon: string;
@@ -90,13 +91,28 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               />
             </div>
             
-            <CollapsibleTrigger className="p-1">
-              <ChevronDown className={`h-5 w-5 transition-transform ${isExpanded ? "transform rotate-180" : ""}`} />
-            </CollapsibleTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <CollapsibleTrigger className="p-2 rounded-full bg-[rgba(67,83,255,0.1)] text-[rgba(67,83,255,1)] hover:bg-[rgba(67,83,255,0.2)] transition-colors">
+                    {isExpanded ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <div className="flex items-center">
+                        <Info className="h-5 w-5" />
+                      </div>
+                    )}
+                  </CollapsibleTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>{isExpanded ? "Show less" : "View more details"}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
-        <CollapsibleContent className="px-3 pb-5">
+        <CollapsibleContent className="px-3 pb-5 animate-accordion-down">
           <div className="flex w-full max-w-full flex-col items-stretch">
             <p className={`text-black text-sm font-normal leading-[23px] font-nunito-sans ${!enabled ? "opacity-50" : ""}`}>
               LTD Insurance protects your ability to earn an income with benefits
