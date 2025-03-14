@@ -1,8 +1,6 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  InsuranceHeader,
   UserInfoCard,
   InsurancePlanCard,
   InsuranceSummary,
@@ -115,11 +113,6 @@ const Index = () => {
 
   return (
     <main className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto px-[60px] py-[81px] max-md:px-5">
-      <InsuranceHeader
-        title="Insurance That Fits Your Budget"
-        description="Each Of These Affordable Insurance Options Takes Less Than One Hour Of Work Per Week To Cover."
-      />
-
       <div className="mt-[33px]">
         <UserInfoCard
           age={userInfo.age}
