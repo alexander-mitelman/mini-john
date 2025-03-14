@@ -37,15 +37,25 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   // Format the price display with dollar amount on top line and /week on bottom line
-  const formatPrice = (price: string) => {
+  const formatPrice = (price: string, expanded: boolean = false) => {
     if (!price) return "";
     const parts = price.split("/");
+    
+    // Apply different color styles when expanded
+    const dollarStyle = expanded 
+      ? "font-[900] text-[#9b87f5] text-lg leading-tight"
+      : `font-[900] text-[rgba(102,112,133,1)] text-lg leading-tight ${!enabled ? "opacity-50" : ""}`;
+
+    const periodStyle = expanded
+      ? "text-[12px] text-[rgba(181,179,179,1)] leading-tight"
+      : `text-[12px] text-[rgba(181,179,179,1)] leading-tight ${!enabled ? "opacity-50" : ""}`;
+    
     return (
       <div className="flex flex-col items-end">
-        <span className={`font-[900] text-[rgba(102,112,133,1)] text-lg leading-tight ${!enabled ? "opacity-50" : ""}`}>
+        <span className={dollarStyle}>
           {parts[0]}
         </span>
-        <span className={`text-[12px] text-[rgba(181,179,179,1)] leading-tight ${!enabled ? "opacity-50" : ""}`}>
+        <span className={periodStyle}>
           {parts.length > 1 ? `/${parts[1]}` : ""}
         </span>
       </div>
@@ -126,6 +136,14 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               that can be paid up to your normal retirement age. With Guaranteed
               Issue, you're enrolled as soon as you sign up.
             </p>
+            
+            {/* Display price with different color when expanded */}
+            {isExpanded && price && (
+              <div className="flex justify-end mt-3 mb-2">
+                {formatPrice(price, true)}
+              </div>
+            )}
+            
             <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] font-bold text-center leading-loose mt-2 ${!enabled ? "opacity-50" : ""}`}>
               {features.map((feature, index) => (
                 <InsurancePlanFeature
