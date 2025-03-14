@@ -46,7 +46,7 @@ export const UserInfoCard: React.FC<UserInfoCardProps> = ({
           <div className="flex flex-col items-stretch justify-center">
             <div 
               onClick={() => onEdit('zipCode')}
-              className="self-stretch bg-white border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(0,0,0,0.2)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+              className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
             >
               <span className="text-[9px] text-[rgba(102,112,133,1)]">
                 ZipCode
@@ -56,7 +56,7 @@ export const UserInfoCard: React.FC<UserInfoCardProps> = ({
           </div>
           <div 
             onClick={() => onEdit('income')}
-            className="self-stretch bg-white border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(0,0,0,0.2)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
+            className="self-stretch bg-white shadow-[0px_15px_56px_rgba(162,148,253,0.4)] border min-h-[29px] gap-[19px] px-[7px] py-[11px] rounded-xl border-[rgba(67,83,255,1)] border-solid cursor-pointer hover:bg-gray-50 transition-colors"
           >
             <span className="text-[9px] text-[rgba(102,112,133,1)]">
               Income
