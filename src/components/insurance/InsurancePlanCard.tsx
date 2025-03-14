@@ -21,6 +21,7 @@ interface InsurancePlanCardProps {
   className?: string;
   enabled?: boolean;
   onToggle?: (enabled: boolean) => void;
+  onExpand?: () => void;
 }
 
 export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
@@ -29,12 +30,16 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   price = "",
   icon,
   features = [],
-  isExpanded: initialExpanded = false,
+  isExpanded: controlledExpanded = false,
   className = "",
   enabled = true,
   onToggle,
+  onExpand,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(initialExpanded);
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  
+  // Use controlled or uncontrolled expansion state
+  const isExpanded = onExpand ? controlledExpanded : internalExpanded;
 
   // Format the price display with dollar amount on top line and /week on bottom line
   const formatPrice = (price: string) => {
@@ -73,9 +78,13 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       return;
     }
     
-    // Only Long Term Disability can expand
-    if (title === "Long Term Disability") {
-      setIsExpanded(!isExpanded);
+    // For expandable cards (LTD or STD), toggle expansion
+    if (title === "Long Term Disability" || title === "Short-term Disability") {
+      if (onExpand) {
+        onExpand();
+      } else {
+        setInternalExpanded(!isExpanded);
+      }
     }
   };
 
@@ -84,7 +93,13 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     return (
       <Collapsible
         open={isExpanded}
-        onOpenChange={setIsExpanded}
+        onOpenChange={(open) => {
+          if (onExpand && open) {
+            onExpand();
+          } else if (!onExpand) {
+            setInternalExpanded(open);
+          }
+        }}
         className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""} cursor-pointer`}
       >
         {/* Card layout with dedicated icon column - now clickable */}
@@ -113,7 +128,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
                 {description}
               </p>
               
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 {price && formatPrice(price)}
                 
                 <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
@@ -122,8 +137,6 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
                     onCheckedChange={(checked) => onToggle && onToggle(checked)}
                   />
                 </div>
-                
-                {/* Info icon removed */}
               </div>
             </div>
           </div>
@@ -153,13 +166,21 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     );
   }
 
-  // For Short Term Disability with icon
+  // For Short Term Disability with icon - now expandable
   if (title === "Short-term Disability") {
     return (
-      <article
-        className={`bg-white rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+      <Collapsible
+        open={isExpanded}
+        onOpenChange={(open) => {
+          if (onExpand && open) {
+            onExpand();
+          } else if (!onExpand) {
+            setInternalExpanded(open);
+          }
+        }}
+        className={`bg-white rounded-2xl border-2 ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} ${className} ${!enabled ? "opacity-70" : ""} cursor-pointer`}
       >
-        <div className="flex w-full">
+        <div className="flex w-full" onClick={handleCardClick}>
           {/* Icon column - centered vertically and horizontally */}
           <div className="flex-shrink-0 flex items-center justify-center py-3 pl-3.5 pr-2">
             <img
@@ -173,7 +194,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           <div className="flex-grow flex flex-col pr-3.5">
             {/* Title at the top */}
             <div className="pt-3 pb-2">
-              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+              <h3 className={`${isExpanded ? "text-[#9b87f5]" : "text-[rgba(67,83,255,1)]"} text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
                 {title}
               </h3>
             </div>
@@ -184,10 +205,10 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
                 {description}
               </p>
               
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 {price && formatPrice(price)}
                 
-                <div className="flex items-center">
+                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                   <Switch 
                     checked={enabled}
                     onCheckedChange={(checked) => onToggle && onToggle(checked)}
@@ -197,7 +218,16 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             </div>
           </div>
         </div>
-      </article>
+
+        <CollapsibleContent className="px-3 pb-5 animate-accordion-down">
+          <div className="flex w-full max-w-full flex-col items-stretch">
+            <p className={`text-black text-sm font-normal leading-[23px] font-nunito-sans ${!enabled ? "opacity-50" : ""}`}>
+              STD Insurance provides income protection for short-term disabilities up to 26 weeks. 
+              It replaces a portion of your income while you recover from an illness or injury.
+            </p>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     );
   }
 
@@ -232,7 +262,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
                 {description}
               </p>
               
-              <div className="flex items-center gap-3 shrink-0">
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 {price && formatPrice(price)}
                 
                 <div className="flex items-center">
@@ -267,7 +297,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           {description}
         </p>
         
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-col items-end gap-2 shrink-0">
           {price && formatPrice(price)}
           
           <div className="flex items-center">

@@ -29,6 +29,9 @@ const Index = () => {
   const [focusField, setFocusField] = useState<'age' | 'zipCode' | 'income' | undefined>(undefined);
   const [inputError, setInputError] = useState("");
 
+  // Track which product is expanded
+  const [expandedProduct, setExpandedProduct] = useState<string>("ltd");
+
   // Get quotes from hook
   const { quotes, loading, error } = useQuotes(userInfo, inputError);
 
@@ -53,6 +56,11 @@ const Index = () => {
       title: enabled ? "Product added" : "Product removed",
       description: `${product.toUpperCase()} insurance has been ${enabled ? "added to" : "removed from"} your plan.`,
     });
+  };
+
+  // Handle expanding a product
+  const handleExpandProduct = (product: string) => {
+    setExpandedProduct(product);
   };
 
   // Total weekly price calculation (only for enabled products)
@@ -144,10 +152,11 @@ const Index = () => {
               title="Long Term Disability"
               description="Protect your income when you need it most"
               price={quotes.ltd?.price || "$0.00/week"}
-              isExpanded={true} /* Set to true to expand by default */
+              isExpanded={expandedProduct === "ltd"} /* This product expands by default */
               features={longTermDisabilityFeatures}
               enabled={enabledProducts.ltd}
               onToggle={(enabled) => handleToggleProduct('ltd', enabled)}
+              onExpand={() => handleExpandProduct('ltd')}
             />
           </div>
 
@@ -156,8 +165,10 @@ const Index = () => {
               title="Short-term Disability"
               description="Protect your income when you need it most"
               price={quotes.std?.price || "$0.00/week"}
+              isExpanded={expandedProduct === "std"}
               enabled={enabledProducts.std}
               onToggle={(enabled) => handleToggleProduct('std', enabled)}
+              onExpand={() => handleExpandProduct('std')}
             />
           </div>
 
