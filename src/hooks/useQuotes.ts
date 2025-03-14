@@ -5,13 +5,23 @@ import { fetchWithToken, getToken, fetchToken } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor, isServerCalculations } from '../utils/config';
 
+interface ProductQuotes {
+  ltd: any | null;
+  std: any | null;
+  life: any | null;
+  accident: any | null;
+  dental: any | null;
+  vision: any | null;
+  critical: any | null;
+}
+
 /**
  * Hook for managing insurance quotes
  * Fetches and updates quotes based on changes to user information
  */
 export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   // We'll store results for each product in an object:
-  const [quotes, setQuotes] = useState({
+  const [quotes, setQuotes] = useState<ProductQuotes>({
     ltd: null,
     std: null,
     life: null,
@@ -81,9 +91,9 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
         const updated = { ...prev };
         for (const productResult of results) {
           if (productResult.status === 'rejected') {
-            updated[productResult.reason.product] = productResult.reason.data;
+            updated[productResult.reason.product as keyof ProductQuotes] = productResult.reason.data;
           } else {
-            updated[productResult.value.product] = productResult.value.data;
+            updated[productResult.value.product as keyof ProductQuotes] = productResult.value.data;
           }
         }
         return updated;
@@ -117,17 +127,15 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     const changedEmployeeCoverage = individualInfo.employeeCoverage !== prevEmployeeCoverageRef.current;
     const changedSpouseCoverage = individualInfo.spouseCoverage !== prevSpouseCoverageRef.current;
 
-    const productsToFetch = [] as string[];
+    const productsToFetch: string[] = [];
 
     // For each product, check if any triggers changed
     for (const product of Object.keys(productConfig)) {
       const triggers = productConfig[product as keyof typeof productConfig].triggers;
-      // If triggers.age is true and changedAge is true -> fetch
-      // If triggers.salary is true and changedSalary is true -> fetch
-      // If triggers.zipCode is true and changedZip is true -> fetch
-      // and etc...
-
+      
+      // Check if any of the triggers match the changed fields
       let needsFetch = false;
+      
       if (triggers.age && changedAge) needsFetch = true;
       if (triggers.annualSalary && changedSalary) needsFetch = true;
       if (triggers.zipCode && changedZip) needsFetch = true;
