@@ -46,10 +46,10 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
             />
             <div className="flex flex-col items-stretch mt-1.5">
-              <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none">
+              <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito">
                 {title}
               </h3>
-              <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px]">
+              <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito">
                 {description}
               </p>
             </div>
@@ -71,7 +71,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 
         <CollapsibleContent className="px-3 pb-5">
           <div className="flex w-full max-w-full flex-col items-stretch">
-            <p className="text-black text-sm font-normal leading-[23px]">
+            <p className="text-black text-sm font-normal leading-[23px] font-nunito">
               LTD Insurance protects your ability to earn an income with benefits
               that can be paid up to your normal retirement age. With Guaranteed
               Issue, you're enrolled as soon as you sign up.
@@ -105,10 +105,10 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
           />
           <div className="flex flex-col items-stretch mt-1.5">
-            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none">
+            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito">
               {title}
             </h3>
-            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px]">
+            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito">
               {description}
             </p>
           </div>
@@ -138,10 +138,10 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
           />
           <div className="flex flex-col items-stretch mt-1.5">
-            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none">
+            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito">
               {title}
             </h3>
-            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px]">
+            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px] font-nunito">
               {description}
             </p>
           </div>
@@ -164,10 +164,10 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       className={`bg-white flex gap-5 justify-between px-[70px] py-[21px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className}`}
     >
       <div className="mt-1">
-        <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none max-md:mr-[5px]">
+        <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none max-md:mr-[5px] font-nunito">
           {title}
         </h3>
-        <p className="text-[#6C757D] text-xs font-normal capitalize mt-[11px]">
+        <p className="text-[#6C757D] text-xs font-normal capitalize mt-[11px] font-nunito">
           {description}
         </p>
       </div>
