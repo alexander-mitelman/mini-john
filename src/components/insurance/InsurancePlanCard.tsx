@@ -1,5 +1,8 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 interface Feature {
   icon: string;
@@ -19,46 +22,110 @@ interface InsurancePlanCardProps {
 export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   title,
   description,
-  price,
+  price = "",
   icon,
   features = [],
-  isExpanded = false,
+  isExpanded: initialExpanded = false,
   className = "",
 }) => {
-  if (isExpanded) {
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
+
+  // For long term disability with collapsible content
+  if (title === "Long Term Disability") {
     return (
-      <article
-        className={`border-[color:var(--Color,#4353FF)] shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] flex flex-col items-center px-[3px] py-[25px] rounded-2xl border-2 border-solid ${className}`}
+      <Collapsible
+        open={isExpanded}
+        onOpenChange={setIsExpanded}
+        className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white`}
       >
-        <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none">
-          {title}
-        </h3>
-        <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize ml-2.5 mt-[11px]">
-          {description}
-        </p>
-        <div className="self-stretch flex shrink-0 h-1.5 mt-[19px]" />
-        <div className="flex w-[324px] max-w-full flex-col items-stretch mt-[9px]">
-          <p className="text-black text-sm font-normal leading-[23px]">
-            LTD Insurance protects your ability to earn an income with benefits
-            that can be paid up to your normal retirement age. With Guaranteed
-            Issue, you're enrolled as soon as you sign up.
-          </p>
-          <div className="flex flex-col text-xs text-[rgba(74,85,104,1)] font-bold text-center leading-loose mt-2">
-            {features.map((feature, index) => (
-              <InsurancePlanFeature
-                key={index}
-                icon={feature.icon}
-                text={feature.text}
-                className={index === 2 ? "text-zinc-600" : ""}
-              />
-            ))}
+        <div className="flex w-full justify-between px-3.5 py-[19px]">
+          <div className="flex gap-[15px]">
+            <img
+              src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
+              alt="Long Term Disability icon"
+              className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
+            />
+            <div className="flex flex-col items-stretch mt-1.5">
+              <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none">
+                {title}
+              </h3>
+              <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px]">
+                {description}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center">
+            {!isExpanded && (
+              <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] text-right mr-2">
+                $28.21
+                <span className="text-[12px] text-[rgba(181,179,179,1)]">
+                  /week
+                </span>
+              </div>
+            )}
+            <CollapsibleTrigger className="p-1">
+              <ChevronDown className={`h-5 w-5 transition-transform ${isExpanded ? "transform rotate-180" : ""}`} />
+            </CollapsibleTrigger>
           </div>
         </div>
+
+        <CollapsibleContent className="px-3 pb-5">
+          <div className="flex w-full max-w-full flex-col items-stretch">
+            <p className="text-black text-sm font-normal leading-[23px]">
+              LTD Insurance protects your ability to earn an income with benefits
+              that can be paid up to your normal retirement age. With Guaranteed
+              Issue, you're enrolled as soon as you sign up.
+            </p>
+            <div className="flex flex-col text-xs text-[rgba(74,85,104,1)] font-bold text-center leading-loose mt-2">
+              {features.map((feature, index) => (
+                <InsurancePlanFeature
+                  key={index}
+                  icon={feature.icon}
+                  text={feature.text}
+                  className={index === 2 ? "text-zinc-600" : ""}
+                />
+              ))}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  }
+
+  // For Short Term Disability with icon
+  if (title === "Short-term Disability") {
+    return (
+      <article
+        className={`bg-white flex gap-5 justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className}`}
+      >
+        <div className="flex gap-[15px]">
+          <img
+            src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
+            alt={`${title} icon`}
+            className="aspect-[0.76] object-contain w-[41px] self-stretch shrink-0"
+          />
+          <div className="flex flex-col items-stretch mt-1.5">
+            <h3 className="text-[rgba(67,83,255,1)] text-base font-bold leading-none">
+              {title}
+            </h3>
+            <p className="text-[#6C757D] text-xs font-normal leading-loose capitalize mt-[11px]">
+              {description}
+            </p>
+          </div>
+        </div>
+        {price && (
+          <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] text-right">
+            {price.split("/")[0]}
+            <span className="text-[12px] text-[rgba(181,179,179,1)]">
+              {`/${price.split("/")[1]}`}
+            </span>
+          </div>
+        )}
       </article>
     );
   }
 
-  // Compact version with icon and price
+  // Compact version with icon for other plans
   if (icon) {
     return (
       <article

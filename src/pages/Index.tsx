@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   InsuranceHeader,
@@ -84,7 +85,7 @@ const Index = () => {
         <InsurancePlanCard
           title="Long Term Disability"
           description="Protect your income when you need it most"
-          isExpanded={true}
+          isExpanded={false}
           features={longTermDisabilityFeatures}
         />
       </div>
