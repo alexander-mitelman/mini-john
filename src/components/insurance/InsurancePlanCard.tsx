@@ -36,19 +36,19 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
-  // Format the price display
+  // Format the price display with dollar amount on top line and /week on bottom line
   const formatPrice = (price: string) => {
     if (!price) return "";
     const parts = price.split("/");
     return (
-      <>
-        <span className={`font-[900] text-[rgba(102,112,133,1)] ${!enabled ? "opacity-50" : ""}`}>
+      <div className="flex flex-col items-end">
+        <span className={`font-[900] text-[rgba(102,112,133,1)] text-lg leading-tight ${!enabled ? "opacity-50" : ""}`}>
           {parts[0]}
         </span>
-        <span className={`text-[12px] text-[rgba(181,179,179,1)] ${!enabled ? "opacity-50" : ""}`}>
+        <span className={`text-[12px] text-[rgba(181,179,179,1)] leading-tight ${!enabled ? "opacity-50" : ""}`}>
           {parts.length > 1 ? `/${parts[1]}` : ""}
         </span>
-      </>
+      </div>
     );
   };
 
@@ -60,29 +60,27 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         onOpenChange={setIsExpanded}
         className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""}`}
       >
-        <div className="flex w-full px-3.5 py-[19px] items-center justify-between">
-          <div className="flex gap-[15px] max-w-[60%]">
-            <img
-              src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
-              alt="Long Term Disability icon"
-              className="aspect-[0.76] object-contain w-[41px] self-start shrink-0"
-            />
-            <div className="flex flex-col min-w-0">
-              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
-                {title}
-              </h3>
-              <p className={`text-[#6C757D] text-xs font-normal leading-loose mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
-                {description}
-              </p>
-            </div>
-          </div>
+        {/* Description at the top */}
+        <div className="px-3.5 pt-4 pb-2">
+          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
+            {description}
+          </p>
+        </div>
+        
+        {/* Main row with icon, title, price, switch, info button */}
+        <div className="flex w-full px-3.5 py-3 items-center">
+          <img
+            src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
+            alt="Long Term Disability icon"
+            className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
+          />
+          
+          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
+            {title}
+          </h3>
           
           <div className="flex items-center gap-3 shrink-0">
-            {!isExpanded && price && (
-              <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
-                {formatPrice(price)}
-              </div>
-            )}
+            {!isExpanded && price && formatPrice(price)}
             
             <div className="flex items-center">
               <Switch 
@@ -139,36 +137,36 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (title === "Short-term Disability") {
     return (
       <article
-        className={`bg-white flex justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white flex flex-col px-3.5 py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        <div className="flex gap-[15px] max-w-[60%]">
+        {/* Description at the top */}
+        <div className="pb-2">
+          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
+            {description}
+          </p>
+        </div>
+        
+        {/* Main row with icon, title, price, switch */}
+        <div className="flex items-center">
           <img
             src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
             alt={`${title} icon`}
-            className="aspect-[0.76] object-contain w-[41px] self-start shrink-0"
+            className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
           />
-          <div className="flex flex-col min-w-0">
-            <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
-              {title}
-            </h3>
-            <p className={`text-[#6C757D] text-xs font-normal leading-loose mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
-              {description}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-3 shrink-0">
-          {price && (
-            <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
-              {formatPrice(price)}
-            </div>
-          )}
           
-          <div className="flex items-center">
-            <Switch 
-              checked={enabled}
-              onCheckedChange={(checked) => onToggle && onToggle(checked)}
-            />
+          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
+            {title}
+          </h3>
+          
+          <div className="flex items-center gap-3 shrink-0">
+            {price && formatPrice(price)}
+            
+            <div className="flex items-center">
+              <Switch 
+                checked={enabled}
+                onCheckedChange={(checked) => onToggle && onToggle(checked)}
+              />
+            </div>
           </div>
         </div>
       </article>
@@ -179,36 +177,36 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (icon) {
     return (
       <article
-        className={`bg-white flex justify-between px-3.5 py-[19px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white flex flex-col px-3.5 py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        <div className="flex gap-[15px] max-w-[60%]">
+        {/* Description at the top */}
+        <div className="pb-2">
+          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
+            {description}
+          </p>
+        </div>
+        
+        {/* Main row with icon, title, price, switch */}
+        <div className="flex items-center">
           <img
             src={icon}
             alt={`${title} icon`}
-            className="aspect-[0.76] object-contain w-[41px] self-start shrink-0"
+            className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
           />
-          <div className="flex flex-col min-w-0">
-            <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
-              {title}
-            </h3>
-            <p className={`text-[#6C757D] text-xs font-normal leading-loose mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
-              {description}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-3 shrink-0">
-          {price && (
-            <div className="text-[rgba(102,112,133,1)] text-lg font-extrabold leading-[22px] whitespace-nowrap">
-              {formatPrice(price)}
-            </div>
-          )}
           
-          <div className="flex items-center">
-            <Switch 
-              checked={enabled}
-              onCheckedChange={(checked) => onToggle && onToggle(checked)}
-            />
+          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
+            {title}
+          </h3>
+          
+          <div className="flex items-center gap-3 shrink-0">
+            {price && formatPrice(price)}
+            
+            <div className="flex items-center">
+              <Switch 
+                checked={enabled}
+                onCheckedChange={(checked) => onToggle && onToggle(checked)}
+              />
+            </div>
           </div>
         </div>
       </article>
@@ -218,29 +216,30 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   // Compact version without icon
   return (
     <article
-      className={`bg-white flex justify-between px-[70px] py-[21px] rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className} ${!enabled ? "opacity-70" : ""}`}
+      className={`bg-white flex flex-col px-[70px] py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className} ${!enabled ? "opacity-70" : ""}`}
     >
-      <div className="mt-1 max-w-[60%] min-w-0">
-        <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none max-md:mr-[5px] font-nunito-sans font-[700] whitespace-nowrap ${!enabled ? "opacity-50" : ""}`}>
-          {title}
-        </h3>
-        <p className={`text-[#6C757D] text-xs font-normal mt-[11px] font-nunito-sans font-[400] overflow-hidden text-ellipsis ${!enabled ? "opacity-50" : ""}`}>
+      {/* Description at the top */}
+      <div className="pb-2">
+        <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
           {description}
         </p>
       </div>
       
-      <div className="flex items-center gap-3 shrink-0">
-        {price && (
-          <div className="text-black text-lg font-extrabold leading-[22px] whitespace-nowrap">
-            {formatPrice(price)}
-          </div>
-        )}
+      {/* Main row with title, price, switch */}
+      <div className="flex items-center">
+        <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
+          {title}
+        </h3>
         
-        <div className="flex items-center">
-          <Switch 
-            checked={enabled}
-            onCheckedChange={(checked) => onToggle && onToggle(checked)}
-          />
+        <div className="flex items-center gap-3 shrink-0">
+          {price && formatPrice(price)}
+          
+          <div className="flex items-center">
+            <Switch 
+              checked={enabled}
+              onCheckedChange={(checked) => onToggle && onToggle(checked)}
+            />
+          </div>
         </div>
       </div>
     </article>
