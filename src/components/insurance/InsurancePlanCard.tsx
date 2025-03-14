@@ -37,16 +37,17 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
 
   // Format the price display with dollar amount on top line and /week on bottom line
-  const formatPrice = (price: string, expanded: boolean = false) => {
+  const formatPrice = (price: string) => {
     if (!price) return "";
     const parts = price.split("/");
     
-    // Apply different color styles when expanded
-    const dollarStyle = expanded 
+    // Apply different color styles based on expanded state and whether it's LTD
+    const isLTD = title === "Long Term Disability";
+    const dollarStyle = isLTD && isExpanded 
       ? "font-[900] text-[#9b87f5] text-lg leading-tight"
       : `font-[900] text-[rgba(102,112,133,1)] text-lg leading-tight ${!enabled ? "opacity-50" : ""}`;
 
-    const periodStyle = expanded
+    const periodStyle = isLTD && isExpanded
       ? "text-[12px] text-[rgba(181,179,179,1)] leading-tight"
       : `text-[12px] text-[rgba(181,179,179,1)] leading-tight ${!enabled ? "opacity-50" : ""}`;
     
@@ -97,7 +98,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               </p>
               
               <div className="flex items-center gap-3 shrink-0">
-                {!isExpanded && price && formatPrice(price)}
+                {price && formatPrice(price)}
                 
                 <div className="flex items-center">
                   <Switch 
@@ -136,13 +137,6 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               that can be paid up to your normal retirement age. With Guaranteed
               Issue, you're enrolled as soon as you sign up.
             </p>
-            
-            {/* Display price with different color when expanded */}
-            {isExpanded && price && (
-              <div className="flex justify-end mt-3 mb-2">
-                {formatPrice(price, true)}
-              </div>
-            )}
             
             <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] font-bold text-center leading-loose mt-2 ${!enabled ? "opacity-50" : ""}`}>
               {features.map((feature, index) => (
