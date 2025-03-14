@@ -10,6 +10,7 @@ import {
 } from "@/components/insurance";
 import { useQuotes } from "@/hooks/useQuotes";
 import { IndividualInfo } from "@/utils/insuranceApi";
+import { HeartPulse } from "lucide-react";
 
 const Index = () => {
   const { toast } = useToast();
@@ -43,6 +44,7 @@ const Index = () => {
     accident: true,
     dental: true,
     vision: true,
+    critical: true,
   });
 
   // Handle toggling a product on/off
@@ -152,7 +154,7 @@ const Index = () => {
               title="Long Term Disability"
               description="Protect your income when you need it most"
               price={quotes.ltd?.price || "$0.00/week"}
-              isExpanded={expandedProduct === "ltd"} /* This product expands by default */
+              isExpanded={expandedProduct === "ltd"} 
               features={longTermDisabilityFeatures}
               enabled={enabledProducts.ltd}
               onToggle={(enabled) => handleToggleProduct('ltd', enabled)}
@@ -216,6 +218,18 @@ const Index = () => {
               className="flex gap-5 justify-between px-3.5 py-[22px]"
               enabled={enabledProducts.accident}
               onToggle={(enabled) => handleToggleProduct('accident', enabled)}
+            />
+          </div>
+
+          <div className="mt-4">
+            <InsurancePlanCard
+              title="Critical Illness/Cancer"
+              description="Financial protection for serious illness"
+              price={quotes.critical?.price || "$0.00/week"}
+              icon="/lovable-uploads/489b614e-ea23-49c3-854d-f469ef9e211e.png"
+              className="flex gap-5 justify-between px-3.5 py-[22px]"
+              enabled={enabledProducts.critical}
+              onToggle={(enabled) => handleToggleProduct('critical', enabled)}
             />
           </div>
 

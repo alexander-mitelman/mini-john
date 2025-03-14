@@ -117,6 +117,10 @@ const mockProductData: Record<string, ProductResponse> = {
     price: "$9.48/week",
     weeklyPrice: 9.48,
   },
+  critical: {
+    price: "$15.30/week",
+    weeklyPrice: 15.30,
+  },
 };
 
 // Helper function to simulate API responses with some variation based on user info
@@ -175,6 +179,7 @@ export const fetchAllProducts = async (userInfo: UserInfo): Promise<InsurancePro
     accident: calculateAdjustedPrice(mockProductData.accident, enrichedUserInfo, 'accident'),
     dental: calculateAdjustedPrice(mockProductData.dental, enrichedUserInfo, 'dental'),
     vision: calculateAdjustedPrice(mockProductData.vision, enrichedUserInfo, 'vision'),
+    critical: calculateAdjustedPrice(mockProductData.critical, enrichedUserInfo, 'critical'),
   };
 };
 
