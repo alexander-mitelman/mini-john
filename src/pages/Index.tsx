@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   InsuranceHeader,
@@ -17,8 +16,10 @@ const Index = () => {
   });
   
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [focusField, setFocusField] = useState<'age' | 'zipCode' | 'income' | undefined>(undefined);
 
-  const handleEditUserInfo = () => {
+  const handleEditUserInfo = (field?: 'age' | 'zipCode' | 'income') => {
+    setFocusField(field);
     setIsEditDialogOpen(true);
   };
   
@@ -76,6 +77,7 @@ const Index = () => {
         onClose={() => setIsEditDialogOpen(false)}
         initialValues={userInfo}
         onSubmit={handleUserInfoSubmit}
+        focusField={focusField}
       />
 
       <div className="mt-2">

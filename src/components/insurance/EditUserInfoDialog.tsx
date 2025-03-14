@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +38,7 @@ interface EditUserInfoDialogProps {
     income: string;
   };
   onSubmit: (values: FormValues) => void;
+  focusField?: 'age' | 'zipCode' | 'income';
 }
 
 export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
@@ -45,7 +46,12 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
   onClose,
   initialValues,
   onSubmit,
+  focusField,
 }) => {
+  const ageInputRef = useRef<HTMLInputElement>(null);
+  const zipCodeInputRef = useRef<HTMLInputElement>(null);
+  const incomeInputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,6 +60,21 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
       income: initialValues.income.replace("$", "").replace(",", ""),
     },
   });
+
+  // Focus the appropriate field when the dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        if (focusField === 'age' && ageInputRef.current) {
+          ageInputRef.current.focus();
+        } else if (focusField === 'zipCode' && zipCodeInputRef.current) {
+          zipCodeInputRef.current.focus();
+        } else if (focusField === 'income' && incomeInputRef.current) {
+          incomeInputRef.current.focus();
+        }
+      }, 100); // Short delay to ensure the dialog is fully open
+    }
+  }, [isOpen, focusField]);
 
   const handleSubmit = (values: FormValues) => {
     // Format the income to include $ and commas
@@ -80,7 +101,15 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                 <FormItem>
                   <FormLabel>Age</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      ref={(e) => {
+                        // Handle both refs
+                        field.ref(e);
+                        ageInputRef.current = e;
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,7 +122,13 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                 <FormItem>
                   <FormLabel>Zip Code</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input 
+                      {...field} 
+                      ref={(e) => {
+                        field.ref(e);
+                        zipCodeInputRef.current = e;
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,7 +141,14 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                 <FormItem>
                   <FormLabel>Income</FormLabel>
                   <FormControl>
-                    <Input placeholder="100000" {...field} />
+                    <Input 
+                      placeholder="100000" 
+                      {...field} 
+                      ref={(e) => {
+                        field.ref(e);
+                        incomeInputRef.current = e;
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
