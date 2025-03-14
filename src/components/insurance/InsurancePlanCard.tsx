@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -143,14 +144,14 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 
         <CollapsibleContent className="px-3 pb-5 animate-accordion-down">
           <div className="flex w-full max-w-full flex-col items-stretch">
-            <p className={`text-black text-sm font-normal leading-[23px] font-nunito-sans ${!enabled ? "opacity-50" : ""}`}>
+            <p className={`text-black text-sm font-normal leading-[23px] font-nunito-sans mb-4 ${!enabled ? "opacity-50" : ""}`}>
               LTD Insurance protects your ability to earn an income with benefits
               that can be paid up to your normal retirement age. With Guaranteed
               Issue, you're enrolled as soon as you sign up.
             </p>
             
-            <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] mt-2 ${!enabled ? "opacity-50" : ""}`}>
-              {features.map((feature, index) => (
+            <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] mt-2 space-y-2 ${!enabled ? "opacity-50" : ""}`}>
+              {features && features.map((feature, index) => (
                 <InsurancePlanFeature
                   key={index}
                   icon={feature.icon}
