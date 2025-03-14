@@ -60,14 +60,14 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         onOpenChange={setIsExpanded}
         className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""}`}
       >
-        {/* Description at the top */}
+        {/* Title at the top */}
         <div className="px-3.5 pt-4 pb-2">
-          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
+          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+            {title}
+          </h3>
         </div>
         
-        {/* Main row with icon, title, price, switch, info button */}
+        {/* Main row with description, icon, price, switch, info button */}
         <div className="flex w-full px-3.5 py-3 items-center">
           <img
             src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
@@ -75,9 +75,9 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
           />
           
-          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
-            {title}
-          </h3>
+          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+            {description}
+          </p>
           
           <div className="flex items-center gap-3 shrink-0">
             {!isExpanded && price && formatPrice(price)}
@@ -139,14 +139,14 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       <article
         className={`bg-white flex flex-col px-3.5 py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        {/* Description at the top */}
+        {/* Title at the top */}
         <div className="pb-2">
-          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
+          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+            {title}
+          </h3>
         </div>
         
-        {/* Main row with icon, title, price, switch */}
+        {/* Main row with description, icon, price, switch */}
         <div className="flex items-center">
           <img
             src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
@@ -154,9 +154,9 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
           />
           
-          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
-            {title}
-          </h3>
+          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+            {description}
+          </p>
           
           <div className="flex items-center gap-3 shrink-0">
             {price && formatPrice(price)}
@@ -179,14 +179,14 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       <article
         className={`bg-white flex flex-col px-3.5 py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
       >
-        {/* Description at the top */}
+        {/* Title at the top */}
         <div className="pb-2">
-          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
-            {description}
-          </p>
+          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+            {title}
+          </h3>
         </div>
         
-        {/* Main row with icon, title, price, switch */}
+        {/* Main row with description, icon, price, switch */}
         <div className="flex items-center">
           <img
             src={icon}
@@ -194,9 +194,9 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             className="aspect-[0.76] object-contain w-[41px] shrink-0 mr-3"
           />
           
-          <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
-            {title}
-          </h3>
+          <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+            {description}
+          </p>
           
           <div className="flex items-center gap-3 shrink-0">
             {price && formatPrice(price)}
@@ -218,18 +218,18 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     <article
       className={`bg-white flex flex-col px-[70px] py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className} ${!enabled ? "opacity-70" : ""}`}
     >
-      {/* Description at the top */}
+      {/* Title at the top */}
       <div className="pb-2">
-        <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] ${!enabled ? "opacity-50" : ""}`}>
-          {description}
-        </p>
-      </div>
-      
-      {/* Main row with title, price, switch */}
-      <div className="flex items-center">
-        <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] whitespace-nowrap mr-auto ${!enabled ? "opacity-50" : ""}`}>
+        <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
           {title}
         </h3>
+      </div>
+      
+      {/* Main row with description, price, switch */}
+      <div className="flex items-center">
+        <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+          {description}
+        </p>
         
         <div className="flex items-center gap-3 shrink-0">
           {price && formatPrice(price)}
