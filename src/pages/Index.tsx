@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -174,8 +173,8 @@ const Index = () => {
 
   // Product descriptions
   const productDescriptions = {
-    ltd: "Get weekly benefits of $1,200 for lost income, including coverage for pregnancy-related work absence. Guaranteed Issue means immediate enrollment upon sign-up.",
-    std: "Get weekly benefits of $1,200 for lost income, including coverage for pregnancy-related work absence. Guaranteed Issue means immediate enrollment upon sign-up.",
+    ltd: "LTD Insurance Protects Your Ability To Earn An Income With Benefits That Can Be Paid Up To Your Normal Retirement Age. With Guaranteed Issue, You're Enrolled As Soon As You Sign Up.",
+    std: "Weekly Benefits When You Can't Work",
     life: "Life insurance helps loved ones financially in the event of a premature death.",
     dental: "Maintain your oral health with comprehensive coverage that works both in and out of network. Includes $1,500 annual maximum per person and generous coverage for procedures like root canals.",
     vision: "Protect your eye health with annual exams, frames, and lenses through the VSP Network. Just $10 copay for your annual eye exam.",
@@ -184,8 +183,8 @@ const Index = () => {
   };
 
   return (
-    <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto p-0 m-0">
-      <div className="mt-[33px]">
+    <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto">
+      <div className="mt-[33px] px-4">
         <UserInfoCard
           age={userInfo.age}
           zipCode={userInfo.zipCode}
@@ -210,9 +209,9 @@ const Index = () => {
         </div>
       ) : (
         <>
-          <div className="mt-2">
+          <div className="mt-4 px-4">
             <InsurancePlanCard
-              title="Long Term Disability"
+              title="Long-Term Disability"
               description={productDescriptions.ltd}
               price={quotes.ltd?.price || "$0.00/week"}
               isExpanded={expandedProduct === "ltd"} 
@@ -223,9 +222,9 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-2.5">
+          <div className="mt-3 px-4">
             <InsurancePlanCard
-              title="Short Term Disability"
+              title="Short-Term Disability"
               description={productDescriptions.std}
               price={quotes.std?.price || "$0.00/week"}
               isExpanded={expandedProduct === "std"}
@@ -236,7 +235,7 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Life Insurance"
               description={productDescriptions.life}
@@ -250,7 +249,7 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Dental"
               description={productDescriptions.dental}
@@ -264,7 +263,7 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Vision"
               description={productDescriptions.vision}
@@ -278,7 +277,7 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Accident"
               description={productDescriptions.accident}
@@ -292,7 +291,7 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Critical Illness/Cancer"
               description={productDescriptions.critical}
@@ -306,14 +305,14 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-2">
+          <div className="mt-4 px-4">
             <InsuranceSummary 
               weeklyPrice={`$${totalWeeklyPrice}`} 
               hoursOfWork={calculateHoursOfWork()} 
             />
           </div>
 
-          <div className="mt-3.5">
+          <div className="mt-4 px-4 mb-4">
             <CTAButton
               text="Get Your Personalized Quote"
               onClick={handleGetQuote}

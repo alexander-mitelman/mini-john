@@ -8,11 +8,11 @@ interface InsurancePlanFeatureProps {
 
 export const InsurancePlanFeature: React.FC<InsurancePlanFeatureProps> = ({ feature }) => {
   return (
-    <div className="flex items-start">
-      <div className="min-w-[20px] h-5 mr-2 flex items-center justify-center">
-        <Check className="h-4 w-4 text-[rgba(67,83,255,1)]" />
+    <div className="flex items-center">
+      <div className="bg-[#4361EE] rounded-full w-4 h-4 mr-2 flex items-center justify-center">
+        <Check className="h-3 w-3 text-white" />
       </div>
-      <div className="text-xs text-black">{feature}</div>
+      <div className="text-xs text-gray-700">{feature}</div>
     </div>
   );
 };
