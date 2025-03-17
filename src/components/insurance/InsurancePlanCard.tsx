@@ -12,6 +12,7 @@ interface InsurancePlanCardProps {
   features?: string[];
   enabled: boolean;
   isExpanded?: boolean;
+  caption?: string;
   onToggle?: (enabled: boolean) => void;
   onExpand?: () => void;
   className?: string;
@@ -25,6 +26,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   features = [],
   enabled,
   isExpanded = false,
+  caption,
   onToggle = () => {},
   onExpand = () => {},
   className,
@@ -81,6 +83,11 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
             <div className="text-sm font-bold text-[#4361EE]">
               {title}
             </div>
+            {caption && (
+              <div className="text-xs text-[#8E9196] mt-0.5">
+                {caption}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3">

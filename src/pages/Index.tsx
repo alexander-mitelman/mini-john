@@ -182,6 +182,17 @@ const Index = () => {
     critical: "Money won't fix everything but our lump sum payment can help relieve some of the financial stress if cancer or other critical illnesses were to strike."
   };
 
+  // Product captions
+  const productCaptions = {
+    ltd: "Protect Your Income When You Need It Most",
+    std: "Short-Term Coverage For Immediate Needs",
+    life: "Financial Protection For Your Loved Ones",
+    dental: "Comprehensive Oral Health Coverage",
+    vision: "Complete Eye Care Solutions",
+    accident: "Protection For The Unexpected",
+    critical: "Support During Serious Health Events"
+  };
+
   return (
     <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto">
       <div className="mt-[33px] px-4">
@@ -212,6 +223,7 @@ const Index = () => {
           <div className="mt-4 px-4">
             <InsurancePlanCard
               title="Long-Term Disability"
+              caption={productCaptions.ltd}
               description={productDescriptions.ltd}
               price={quotes.ltd?.price || "$0.00/week"}
               isExpanded={expandedProduct === "ltd"} 
@@ -225,6 +237,7 @@ const Index = () => {
           <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Short-Term Disability"
+              caption={productCaptions.std}
               description={productDescriptions.std}
               price={quotes.std?.price || "$0.00/week"}
               isExpanded={expandedProduct === "std"}
@@ -238,6 +251,7 @@ const Index = () => {
           <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Life Insurance"
+              caption={productCaptions.life}
               description={productDescriptions.life}
               price={quotes.life?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/5f9c57b11ebaa7eadf51a69256cff48f2f948c6626ed844068459f36c7c8202b?placeholderIfAbsent=true"
@@ -252,6 +266,7 @@ const Index = () => {
           <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Dental"
+              caption={productCaptions.dental}
               description={productDescriptions.dental}
               price={quotes.dental?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/4c06ccf7d2f8aefefb4333aaca45e934f2f147688a0d3ac41633515a9a80897c?placeholderIfAbsent=true"
@@ -266,6 +281,7 @@ const Index = () => {
           <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Vision"
+              caption={productCaptions.vision}
               description={productDescriptions.vision}
               price={quotes.vision?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/0bbf0b198321af45e362d12ca231b34a03288994a5e4eb7382e767e586308d22?placeholderIfAbsent=true"
@@ -280,6 +296,7 @@ const Index = () => {
           <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Accident"
+              caption={productCaptions.accident}
               description={productDescriptions.accident}
               price={quotes.accident?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/1d6e8727f71bc0136354086a0262a101904e839fe1987b76d93802397374cd47?placeholderIfAbsent=true"
@@ -294,6 +311,7 @@ const Index = () => {
           <div className="mt-3 px-4">
             <InsurancePlanCard
               title="Critical Illness/Cancer"
+              caption={productCaptions.critical}
               description={productDescriptions.critical}
               price={quotes.critical?.price || "$0.00/week"}
               icon="/lovable-uploads/489b614e-ea23-49c3-854d-f469ef9e211e.png"
