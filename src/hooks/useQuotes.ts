@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
-import { fetchWithToken, getToken, fetchToken, clearToken } from '../services/authService';
+import { fetchWithToken, getToken, fetchToken } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
 
@@ -57,8 +57,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
   useEffect(() => {
     console.log('Component mounted, checking authentication status');
-    
-    clearToken();
     
     if (!getToken()) {
       console.log('No token found, initiating token fetch');
