@@ -18,7 +18,7 @@ const Index = () => {
   // User information state
   const [userInfo, setUserInfo] = useState<IndividualInfo>({
     age: 46,
-    zipCode: "070730",
+    zipCode: "12345",
     income: "$200,000",
     annualSalary: 200000,
     employeeCoverage: 20000,
