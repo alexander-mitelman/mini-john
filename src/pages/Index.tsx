@@ -174,7 +174,7 @@ const Index = () => {
   // Product descriptions
   const productDescriptions = {
     ltd: "LTD Insurance Protects Your Ability To Earn An Income With Benefits That Can Be Paid Up To Your Normal Retirement Age. With Guaranteed Issue, You're Enrolled As Soon As You Sign Up.",
-    std: "Weekly Benefits When You Can't Work",
+    std: "Get weekly benefits of $1,200 for lost income, including coverage for pregnancy-related work absence. Guaranteed Issue means immediate enrollment upon sign-up.",
     life: "Life insurance helps loved ones financially in the event of a premature death.",
     dental: "Maintain your oral health with comprehensive coverage that works both in and out of network. Includes $1,500 annual maximum per person and generous coverage for procedures like root canals.",
     vision: "Protect your eye health with annual exams, frames, and lenses through the VSP Network. Just $10 copay for your annual eye exam.",
