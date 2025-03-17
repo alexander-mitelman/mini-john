@@ -1,8 +1,9 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { fetchWithToken, getToken, fetchToken, clearToken } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
-import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor, isServerCalculations } from '../utils/config';
+import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
 
 interface ProductQuotes {
   ltd: any | null;
@@ -55,11 +56,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
 
   useEffect(() => {
-    if (!isServerCalculations()) {
-      console.log('Server calculations disabled, skipping token fetch');
-      return;
-    }
-    
     console.log('Component mounted, checking authentication status');
     
     clearToken();
@@ -132,9 +128,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   );
 
   useEffect(() => {
-    if (!isServerCalculations()) {
-      return;
-    }
     const changedAge = enrichedInfo.age !== prevAgeRef.current;
     const changedSalary = enrichedInfo.annualSalary !== prevSalaryRef.current;
     const changedZip = enrichedInfo.zipCode !== prevZipRef.current;

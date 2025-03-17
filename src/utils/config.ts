@@ -8,11 +8,6 @@ export const isDev = (): boolean => {
   return process.env.NODE_ENV === 'development';
 };
 
-// Check if calculations should be done on server
-export const isServerCalculations = (): boolean => {
-  return true; // This can be toggled based on feature flags or environment
-};
-
 // Distributor identification
 export const isDistributor = (code: string): boolean => {
   return false; // Example implementation - can be updated as needed
