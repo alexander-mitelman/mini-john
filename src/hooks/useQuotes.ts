@@ -1,7 +1,6 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
-import { fetchWithToken, getToken, fetchToken } from '../services/authService';
+import { fetchWithToken, getToken, fetchToken, clearToken } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor, isServerCalculations } from '../utils/config';
 
@@ -15,7 +14,6 @@ interface ProductQuotes {
   critical: any | null;
 }
 
-// Define a proper interface for the triggers
 interface ProductTriggers {
   age?: boolean;
   annualSalary?: boolean;
@@ -29,18 +27,14 @@ interface ProductTriggers {
  * Fetches and updates quotes based on changes to user information
  */
 export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
-  // Ensure annualSalary is derived from income if needed
   const enrichedInfo = {
     ...individualInfo,
-    // Convert income string to annualSalary number if annualSalary is missing
     annualSalary: individualInfo.annualSalary || 
       (individualInfo.income ? parseInt(individualInfo.income.replace(/\$|,/g, '')) : 0),
-    // Ensure default values for coverage
     employeeCoverage: individualInfo.employeeCoverage || 20000,
     spouseCoverage: individualInfo.spouseCoverage || 10000,
   };
 
-  // We'll store results for each product in an object:
   const [quotes, setQuotes] = useState<ProductQuotes>({
     ltd: null,
     std: null,
@@ -51,40 +45,42 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     critical: null,
   });
 
-  // Track loading state—optional if you want partial loading per product
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // We'll store old values of age, salary, zipCode
   const prevAgeRef = useRef(enrichedInfo.age);
   const prevSalaryRef = useRef(enrichedInfo.annualSalary);
   const prevZipRef = useRef(enrichedInfo.zipCode);
   const prevEmployeeCoverageRef = useRef(enrichedInfo.employeeCoverage);
   const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
 
-  // On mount, ensure we have a token
   useEffect(() => {
     if (!isServerCalculations()) {
+      console.log('Server calculations disabled, skipping token fetch');
       return;
     }
-    // else
+    
+    console.log('Component mounted, checking authentication status');
+    
+    clearToken();
+    
     if (!getToken()) {
+      console.log('No token found, initiating token fetch');
       fetchToken().catch(err => {
         console.error('Error fetching initial token:', err);
       });
+    } else {
+      console.log('Token already exists in localStorage');
     }
   }, []);
 
-  // The main function to fetch quotes for a set of products
   const fetchProducts = useCallback(async (productsToFetch: string[], individualInfo: Partial<IndividualInfo>) => {
     if (inputError) {
       return;
     }
-    // else
     setLoading(true);
     setError(null);
     try {
-      // We'll do all requests in parallel
       const requests = productsToFetch.map(async (product) => {
         const { buildUrl } = productConfig[product as keyof typeof productConfig];
         const pathname = buildUrl(individualInfo as IndividualInfo);
@@ -128,7 +124,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     }
   }, [inputError]);
 
-  // Debounced version of fetchProducts
   const debouncedFetchProducts = useCallback(
     debounce((productsToFetch, values) => {
       return fetchProducts(productsToFetch, values);
@@ -136,7 +131,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     [fetchProducts]
   );
 
-  // The effect that checks what changed
   useEffect(() => {
     if (!isServerCalculations()) {
       return;
@@ -149,11 +143,9 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
     const productsToFetch: string[] = [];
 
-    // For each product, check if any triggers changed
     for (const product of Object.keys(productConfig)) {
       const triggers = productConfig[product as keyof typeof productConfig].triggers as ProductTriggers;
       
-      // Check if any of the triggers match the changed fields
       let needsFetch = false;
       
       if (triggers.age && changedAge) needsFetch = true;
@@ -163,14 +155,11 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       if (triggers.spouseCoverage && changedSpouseCoverage) needsFetch = true;
 
       if (needsFetch) {
-        // Skip 'accident' if we've already fetched it
         if (product === 'accident' && quotes.accident !== null) {
-          // Do nothing
-          // accident should be fetched only once, because it doesn't have any dependencies
+          continue;
         }
-        // Skip 'std' if there's no salary info
         else if (product === 'std' && enrichedInfo.annualSalary && enrichedInfo.annualSalary <= 0) { 
-          // Do nothing
+          continue;
         } 
         else {
           productsToFetch.push(product);
@@ -194,7 +183,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     prevEmployeeCoverageRef.current = enrichedInfo.employeeCoverage;
     prevSpouseCoverageRef.current = enrichedInfo.spouseCoverage;
 
-    // Cleanup to avoid memory leaks
     return () => {
       // debouncedFetchProducts.cancel();
     };
