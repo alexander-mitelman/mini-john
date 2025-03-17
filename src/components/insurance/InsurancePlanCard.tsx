@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Check, ChevronDown, ChevronUp, Wheelchair, HandHelping } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Accessibility, HandMetal } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 
@@ -39,9 +39,9 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         className="w-6 h-6 object-contain"
       />;
     } else if (title.includes("Long-Term Disability")) {
-      return <Wheelchair className="w-6 h-6 text-[#4361EE]" />;
+      return <Accessibility className="w-6 h-6 text-[#4361EE]" />;
     } else if (title.includes("Short-Term Disability")) {
-      return <HandHelping className="w-6 h-6 text-[#4361EE]" />;
+      return <HandMetal className="w-6 h-6 text-[#4361EE]" />;
     }
     return null;
   };
