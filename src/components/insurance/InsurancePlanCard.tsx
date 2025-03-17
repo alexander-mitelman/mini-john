@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Check, ChevronDown, ChevronUp, HeartPulse, Umbrella } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Wheelchair, HandHelping } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 
@@ -39,11 +39,22 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         className="w-6 h-6 object-contain"
       />;
     } else if (title.includes("Long-Term Disability")) {
-      return <HeartPulse className="w-6 h-6 text-[#4361EE]" />;
+      return <Wheelchair className="w-6 h-6 text-[#4361EE]" />;
     } else if (title.includes("Short-Term Disability")) {
-      return <Umbrella className="w-6 h-6 text-[#4361EE]" />;
+      return <HandHelping className="w-6 h-6 text-[#4361EE]" />;
     }
     return null;
+  };
+
+  // Format price to display in two rows
+  const formatPrice = () => {
+    const priceValue = price.split('/')[0];
+    return (
+      <div className="flex flex-col items-end">
+        <span className="text-sm font-bold text-[#4361EE]">{priceValue}</span>
+        <span className="text-xs text-gray-500">/week</span>
+      </div>
+    );
   };
 
   return (
@@ -61,9 +72,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-sm font-bold text-[#4361EE]">
-            {price}
-          </div>
+          {formatPrice()}
           <div className="flex items-center gap-2">
             <Switch
               checked={enabled}
