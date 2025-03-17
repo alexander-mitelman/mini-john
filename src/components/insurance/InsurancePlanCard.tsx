@@ -39,9 +39,19 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         className="w-6 h-6 object-contain"
       />;
     } else if (title.includes("Long-Term Disability")) {
-      return <Accessibility className="w-6 h-6 text-[#4361EE]" />;
+      return <img 
+        loading="lazy" 
+        src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png" 
+        alt="LTD" 
+        className="w-6 h-6 object-contain" 
+      />;
     } else if (title.includes("Short-Term Disability")) {
-      return <HandMetal className="w-6 h-6 text-[#4361EE]" />;
+      return <img 
+        loading="lazy" 
+        src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png" 
+        alt="STD" 
+        className="w-6 h-6 object-contain" 
+      />;
     }
     return null;
   };
