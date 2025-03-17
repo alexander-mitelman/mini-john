@@ -61,7 +61,9 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     const priceValue = price.split('/')[0];
     return (
       <div className="flex flex-col items-end">
-        <span className="text-sm font-bold text-[#4361EE]">{priceValue}</span>
+        <span className={`text-sm font-bold ${isExpanded ? 'text-[#4361EE]' : 'text-[#000000]'}`}>
+          {priceValue}
+        </span>
         <span className="text-xs text-gray-500">/week</span>
       </div>
     );
