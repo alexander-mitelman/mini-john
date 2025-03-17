@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { 
@@ -11,6 +10,8 @@ import {
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
 import { toast } from 'sonner';
+import { extractQuota } from '../utils/quoteExtractor';
+import AuthErrorModal from '../components/AuthErrorModal';
 
 interface ProductQuotes {
   ltd: any | null;
@@ -65,11 +66,9 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const prevEmployeeCoverageRef = useRef(enrichedInfo.employeeCoverage);
   const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
 
-  // Initialize authentication on component mount
   useEffect(() => {
     console.log('Component mounted, checking authentication status');
     
-    // Check for max failures at startup
     if (hasExceededMaxFailures()) {
       console.log('Maximum auth failures detected at startup');
       setShowAuthErrorModal(true);
@@ -85,14 +84,12 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
         } catch (err) {
           console.error('Error fetching initial token:', err);
           
-          // Check if we've hit max failures after this attempt
           if (hasExceededMaxFailures()) {
             setShowAuthErrorModal(true);
             return;
           }
           
           toast.error("Failed to authenticate. Retrying...");
-          // Retry after a delay
           setTimeout(initializeAuth, 3000);
         }
       } else {
@@ -104,7 +101,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     initializeAuth();
   }, []);
 
-  // Check for auth failures on every render
   useEffect(() => {
     if (hasExceededMaxFailures() && !showAuthErrorModal) {
       setShowAuthErrorModal(true);
@@ -113,7 +109,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
   const handleCloseAuthErrorModal = useCallback(() => {
     setShowAuthErrorModal(false);
-    resetAuthFailureCount(); // Optional: give them another chance
+    resetAuthFailureCount();
   }, []);
 
   const fetchProducts = useCallback(async (productsToFetch: string[], individualInfo: Partial<IndividualInfo>) => {
@@ -126,7 +122,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       return;
     }
     
-    // Don't try to fetch if we've exceeded max failures
     if (hasExceededMaxFailures()) {
       setShowAuthErrorModal(true);
       return;
@@ -147,22 +142,21 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
         try {
           const response = await fetchWithToken(url);
           console.log('response', response, 'product', product);
-          return { product, data: response.data };
+          
+          const extractedQuota = extractQuota(response.data);
+          
+          return { product, data: extractedQuota };
         } catch (err) {
-          // Check if we hit max auth failures
           if (err instanceof Error && err.message === 'MAX_AUTH_FAILURES_EXCEEDED') {
             setShowAuthErrorModal(true);
             throw err;
           }
           
           console.warn(`Error fetching ${product}:`, err);
-          // Show toast for fetch errors
           toast.error(`Failed to fetch ${product} quote. Please try again.`);
           return { product, data: null };
         }
       });
-
-      const results = await Promise.allSettled(requests);
 
       let hasFailures = false;
       setQuotes(prev => {
@@ -183,9 +177,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     } catch (err) {
       console.error('Error fetching product quotes:', err);
       
-      // Check if it's our max failures error
       if (err instanceof Error && err.message === 'MAX_AUTH_FAILURES_EXCEEDED') {
-        // Already handled by setting showAuthErrorModal
         return;
       }
       
@@ -205,7 +197,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     [fetchProducts]
   );
 
-  // Initial fetch of all products when component mounts
   useEffect(() => {
     const fetchAllProductsOnMount = async () => {
       if (!initialFetchComplete && !inputError && tokenInitialized) {
@@ -217,7 +208,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           setInitialFetchComplete(true);
         } catch (err) {
           console.error('Error during initial fetch:', err);
-          // Retry initial fetch after delay if it fails
           setTimeout(() => {
             if (!initialFetchComplete) {
               fetchAllProductsOnMount();
@@ -230,7 +220,6 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     fetchAllProductsOnMount();
   }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError, tokenInitialized]);
 
-  // Update products when user info changes
   useEffect(() => {
     const changedAge = enrichedInfo.age !== prevAgeRef.current;
     const changedSalary = enrichedInfo.annualSalary !== prevSalaryRef.current;
