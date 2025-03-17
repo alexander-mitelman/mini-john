@@ -184,7 +184,7 @@ const Index = () => {
   };
 
   return (
-    <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto">
+    <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto p-0 m-0">
       <div className="mt-[33px]">
         <UserInfoCard
           age={userInfo.age}

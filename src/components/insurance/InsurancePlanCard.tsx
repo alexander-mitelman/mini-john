@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
@@ -73,7 +73,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 
       {isExpanded && (
         <div 
-          className="px-[11px] pb-[21px] transition-all duration-300 ease-in-out"
+          className="px-[11px] pb-[21px] transition-all duration-300 ease-in-out animate-accordion-down"
         >
           {description && (
             <p className="text-xs text-[rgba(67,83,255,1)] mb-4">
