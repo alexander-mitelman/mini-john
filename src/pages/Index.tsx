@@ -31,7 +31,7 @@ const Index = () => {
   const [inputError, setInputError] = useState("");
 
   // Track which product is expanded
-  const [expandedProduct, setExpandedProduct] = useState<string>("ltd");
+  const [expandedProduct, setExpandedProduct] = useState<string | null>("ltd");
 
   // Get quotes from hook
   const { quotes, loading, error } = useQuotes(userInfo, inputError);
@@ -62,7 +62,7 @@ const Index = () => {
 
   // Handle expanding a product
   const handleExpandProduct = (product: string) => {
-    setExpandedProduct(product);
+    setExpandedProduct(prev => prev === product ? null : product);
   };
 
   // Total weekly price calculation (only for enabled products)
@@ -120,10 +120,71 @@ const Index = () => {
     });
   };
 
-  const longTermDisabilityFeatures = quotes.ltd?.features || [];
+  // Features content for each product
+  const productFeatures = {
+    ltd: [
+      "Up to $1,200 of weekly benefit",
+      "Pregnancy coverage for women",
+      "Guaranteed Issue enrollment",
+      "Quick benefit payments"
+    ],
+    std: [
+      "Up to $1,200 of weekly benefit",
+      "Pregnancy coverage for women",
+      "Guaranteed Issue enrollment",
+      "Quick benefit payments"
+    ],
+    life: [
+      "Cover funeral costs (avg. $15,000), payoff credit debt or establish a college fund.",
+      "Up to $150,000 of coverage.",
+      "Accidental death and dismemberment (AD&D) is part of the policy at the same coverage amount.",
+      "Guaranteed Issue - meaning just sign-up and you're enrolled.",
+      "Spouse is eligible for up to $20,000 of coverage.",
+      "$2.50 provides $10,000 of coverage for all your children.",
+      "Available for employees and dependents"
+    ],
+    dental: [
+      "Same coverage in/out of network",
+      "$1,500 annual maximum per person",
+      "80% coverage for root canals",
+      "$1,000 lifetime child orthodontics"
+    ],
+    vision: [
+      "$10 copay for annual exam",
+      "Annual frames and lenses",
+      "VSP Network coverage",
+      "Preventive care focus"
+    ],
+    accident: [
+      "Large benefits for medical attention",
+      "Direct payment to you",
+      "24/7 coverage on/off job",
+      "+25% for organized sports"
+    ],
+    critical: [
+      "Helps cover expenses that other insurance won't",
+      "Pays $15,000 lump sum for initial diagnosis of covered illnesses",
+      "Pays same lump sum for reoccurrence",
+      "Pays $15,000 on the initial diagnosis of invasive cancer",
+      "Benefit is paid directly to you",
+      "Dozens of illnesses are covered by this policy",
+      "Available for employees and dependents"
+    ]
+  };
+
+  // Product descriptions
+  const productDescriptions = {
+    ltd: "Get weekly benefits of $1,200 for lost income, including coverage for pregnancy-related work absence. Guaranteed Issue means immediate enrollment upon sign-up.",
+    std: "Get weekly benefits of $1,200 for lost income, including coverage for pregnancy-related work absence. Guaranteed Issue means immediate enrollment upon sign-up.",
+    life: "Life insurance helps loved ones financially in the event of a premature death.",
+    dental: "Maintain your oral health with comprehensive coverage that works both in and out of network. Includes $1,500 annual maximum per person and generous coverage for procedures like root canals.",
+    vision: "Protect your eye health with annual exams, frames, and lenses through the VSP Network. Just $10 copay for your annual eye exam.",
+    accident: "Get coverage for both on and off-the-job accidents, with benefits paid directly to you. Receive an extra 25% for accidents during organized sports.",
+    critical: "Money won't fix everything but our lump sum payment can help relieve some of the financial stress if cancer or other critical illnesses were to strike."
+  };
 
   return (
-    <main className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto px-[60px] py-[81px] max-md:px-5">
+    <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto">
       <div className="mt-[33px]">
         <UserInfoCard
           age={userInfo.age}
@@ -152,10 +213,10 @@ const Index = () => {
           <div className="mt-2">
             <InsurancePlanCard
               title="Long Term Disability"
-              description="Protect your income when you need it most"
+              description={productDescriptions.ltd}
               price={quotes.ltd?.price || "$0.00/week"}
               isExpanded={expandedProduct === "ltd"} 
-              features={longTermDisabilityFeatures}
+              features={productFeatures.ltd}
               enabled={enabledProducts.ltd}
               onToggle={(enabled) => handleToggleProduct('ltd', enabled)}
               onExpand={() => handleExpandProduct('ltd')}
@@ -164,10 +225,11 @@ const Index = () => {
 
           <div className="mt-2.5">
             <InsurancePlanCard
-              title="Short-term Disability"
-              description="Protect your income when you need it most"
+              title="Short Term Disability"
+              description={productDescriptions.std}
               price={quotes.std?.price || "$0.00/week"}
               isExpanded={expandedProduct === "std"}
+              features={productFeatures.std}
               enabled={enabledProducts.std}
               onToggle={(enabled) => handleToggleProduct('std', enabled)}
               onExpand={() => handleExpandProduct('std')}
@@ -177,59 +239,70 @@ const Index = () => {
           <div className="mt-4">
             <InsurancePlanCard
               title="Life Insurance"
-              description="Financial protection for your loved ones"
+              description={productDescriptions.life}
               price={quotes.life?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/5f9c57b11ebaa7eadf51a69256cff48f2f948c6626ed844068459f36c7c8202b?placeholderIfAbsent=true"
+              isExpanded={expandedProduct === "life"}
+              features={productFeatures.life}
               enabled={enabledProducts.life}
               onToggle={(enabled) => handleToggleProduct('life', enabled)}
+              onExpand={() => handleExpandProduct('life')}
             />
           </div>
 
           <div className="mt-4">
             <InsurancePlanCard
               title="Dental"
-              description="Coverage for routine dental care and procedures"
+              description={productDescriptions.dental}
               price={quotes.dental?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/4c06ccf7d2f8aefefb4333aaca45e934f2f147688a0d3ac41633515a9a80897c?placeholderIfAbsent=true"
-              className="flex w-full items-stretch gap-5 justify-between px-[11px] py-[21px]"
+              isExpanded={expandedProduct === "dental"}
+              features={productFeatures.dental}
               enabled={enabledProducts.dental}
               onToggle={(enabled) => handleToggleProduct('dental', enabled)}
+              onExpand={() => handleExpandProduct('dental')}
             />
           </div>
 
           <div className="mt-4">
             <InsurancePlanCard
               title="Vision"
-              description="Coverage for eye exams and vision correction"
+              description={productDescriptions.vision}
               price={quotes.vision?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/0bbf0b198321af45e362d12ca231b34a03288994a5e4eb7382e767e586308d22?placeholderIfAbsent=true"
-              className="flex w-full items-stretch gap-5 justify-between px-3 py-[22px]"
+              isExpanded={expandedProduct === "vision"}
+              features={productFeatures.vision}
               enabled={enabledProducts.vision}
               onToggle={(enabled) => handleToggleProduct('vision', enabled)}
+              onExpand={() => handleExpandProduct('vision')}
             />
           </div>
 
           <div className="mt-4">
             <InsurancePlanCard
               title="Accident"
-              description="Financial help if you experience a covered accident"
+              description={productDescriptions.accident}
               price={quotes.accident?.price || "$0.00/week"}
               icon="https://cdn.builder.io/api/v1/image/assets/TEMP/1d6e8727f71bc0136354086a0262a101904e839fe1987b76d93802397374cd47?placeholderIfAbsent=true"
-              className="flex gap-5 justify-between px-3.5 py-[22px]"
+              isExpanded={expandedProduct === "accident"}
+              features={productFeatures.accident}
               enabled={enabledProducts.accident}
               onToggle={(enabled) => handleToggleProduct('accident', enabled)}
+              onExpand={() => handleExpandProduct('accident')}
             />
           </div>
 
           <div className="mt-4">
             <InsurancePlanCard
               title="Critical Illness/Cancer"
-              description="Financial protection for serious illness"
+              description={productDescriptions.critical}
               price={quotes.critical?.price || "$0.00/week"}
               icon="/lovable-uploads/489b614e-ea23-49c3-854d-f469ef9e211e.png"
-              className="flex gap-5 justify-between px-3.5 py-[22px]"
+              isExpanded={expandedProduct === "critical"}
+              features={productFeatures.critical}
               enabled={enabledProducts.critical}
               onToggle={(enabled) => handleToggleProduct('critical', enabled)}
+              onExpand={() => handleExpandProduct('critical')}
             />
           </div>
 

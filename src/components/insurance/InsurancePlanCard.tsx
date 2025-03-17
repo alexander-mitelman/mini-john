@@ -1,318 +1,95 @@
 
 import React, { useState } from "react";
-import { InsurancePlanFeature } from "./InsurancePlanFeature";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-interface Feature {
-  icon: string;
-  text: string;
-}
+import { InsurancePlanFeature } from "./InsurancePlanFeature";
 
 interface InsurancePlanCardProps {
   title: string;
-  description: string;
-  price?: string;
+  description?: string;
+  price: string;
   icon?: string;
-  features?: Feature[];
+  features?: string[];
+  enabled: boolean;
   isExpanded?: boolean;
-  className?: string;
-  enabled?: boolean;
   onToggle?: (enabled: boolean) => void;
   onExpand?: () => void;
+  className?: string;
 }
 
 export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   title,
   description,
-  price = "",
+  price,
   icon,
   features = [],
-  isExpanded: controlledExpanded = false,
-  className = "",
-  enabled = true,
-  onToggle,
-  onExpand,
+  enabled,
+  isExpanded = false,
+  onToggle = () => {},
+  onExpand = () => {},
+  className,
 }) => {
-  const [internalExpanded, setInternalExpanded] = useState(false);
-  
-  // Use controlled or uncontrolled expansion state
-  const isExpanded = onExpand ? controlledExpanded : internalExpanded;
-
-  // Format the price display with dollar amount on top line and /week on bottom line
-  const formatPrice = (price: string) => {
-    if (!price) return "";
-    const parts = price.split("/");
-    
-    // Apply different color styles based on expanded state and whether it's LTD
-    const isLTD = title === "Long Term Disability";
-    const dollarStyle = isLTD && isExpanded 
-      ? "font-[900] text-[#9b87f5] text-lg leading-tight"
-      : `font-[900] text-[rgba(102,112,133,1)] text-lg leading-tight ${!enabled ? "opacity-50" : ""}`;
-
-    const periodStyle = isLTD && isExpanded
-      ? "text-[12px] text-[rgba(181,179,179,1)] leading-tight"
-      : `text-[12px] text-[rgba(181,179,179,1)] leading-tight ${!enabled ? "opacity-50" : ""}`;
-    
-    return (
-      <div className="flex flex-col items-end">
-        <span className={dollarStyle}>
-          {parts[0]}
-        </span>
-        <span className={periodStyle}>
-          {parts.length > 1 ? `/${parts[1]}` : ""}
-        </span>
-      </div>
-    );
-  };
-
-  // Handler for clicking on the card
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't expand/collapse if clicking on the switch
-    if (e.target instanceof Element && (
-        e.target.closest('button[role="switch"]') ||
-        e.target.closest('input[type="checkbox"]')
-      )) {
-      return;
-    }
-    
-    // For expandable cards (LTD or STD), toggle expansion
-    if (title === "Long Term Disability" || title === "Short-term Disability") {
-      if (onExpand) {
-        onExpand();
-      } else {
-        setInternalExpanded(!isExpanded);
-      }
-    }
-  };
-
-  // For long term disability with collapsible content
-  if (title === "Long Term Disability") {
-    return (
-      <Collapsible
-        open={isExpanded}
-        onOpenChange={(open) => {
-          if (onExpand && open) {
-            onExpand();
-          } else if (!onExpand) {
-            setInternalExpanded(open);
-          }
-        }}
-        className={`border-2 rounded-2xl ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] bg-white ${!enabled ? "opacity-70" : ""} cursor-pointer`}
-      >
-        {/* Card layout with dedicated icon column - now clickable */}
-        <div className="flex w-full" onClick={handleCardClick}>
-          {/* Icon column - centered vertically and horizontally */}
-          <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
-            <img
-              src="/lovable-uploads/41ab950c-abc1-4bd0-9edf-50a79e9e8638.png"
-              alt="Long Term Disability icon"
-              className="w-10 h-10 object-contain"
-            />
-          </div>
-
-          {/* Content column */}
-          <div className="flex-grow flex flex-col">
-            {/* Title at the top */}
-            <div className="pt-4 pb-2">
-              <h3 className={`${isExpanded ? "text-[#9b87f5]" : "text-[rgba(67,83,255,1)]"} text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-                {title}
-              </h3>
-            </div>
-            
-            {/* Description and controls */}
-            <div className="flex w-full pr-3.5 pb-3 items-center">
-              <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-                {description}
-              </p>
-              
-              <div className="flex flex-col items-end gap-2 shrink-0">
-                {price && formatPrice(price)}
-                
-                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-                  <Switch 
-                    checked={enabled}
-                    onCheckedChange={(checked) => onToggle && onToggle(checked)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <CollapsibleContent className="px-3 pb-5 animate-accordion-down">
-          <div className="flex w-full max-w-full flex-col items-stretch">
-            <p className={`text-black text-sm font-normal leading-[23px] font-nunito-sans mb-4 ${!enabled ? "opacity-50" : ""}`}>
-              LTD Insurance protects your ability to earn an income with benefits
-              that can be paid up to your normal retirement age. With Guaranteed
-              Issue, you're enrolled as soon as you sign up.
-            </p>
-            
-            <div className={`flex flex-col text-xs text-[rgba(74,85,104,1)] mt-2 space-y-2 ${!enabled ? "opacity-50" : ""}`}>
-              {features && features.map((feature, index) => (
-                <InsurancePlanFeature
-                  key={index}
-                  icon={feature.icon}
-                  text={feature.text}
-                  className="font-medium"
-                />
-              ))}
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  }
-
-  // For Short Term Disability with icon - now expandable
-  if (title === "Short-term Disability") {
-    return (
-      <Collapsible
-        open={isExpanded}
-        onOpenChange={(open) => {
-          if (onExpand && open) {
-            onExpand();
-          } else if (!onExpand) {
-            setInternalExpanded(open);
-          }
-        }}
-        className={`bg-white rounded-2xl border-2 ${isExpanded ? "border-[color:var(--Color,#4353FF)]" : "border-[rgba(67,83,255,0.4)]"} ${className} ${!enabled ? "opacity-70" : ""} cursor-pointer`}
-      >
-        <div className="flex w-full" onClick={handleCardClick}>
-          {/* Icon column - centered vertically and horizontally */}
-          <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
-            <img
-              src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
-              alt={`${title} icon`}
-              className="w-10 h-10 object-contain"
-            />
-          </div>
-
-          {/* Content column */}
-          <div className="flex-grow flex flex-col">
-            {/* Title at the top */}
-            <div className="pt-4 pb-2">
-              <h3 className={`${isExpanded ? "text-[#9b87f5]" : "text-[rgba(67,83,255,1)]"} text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-                {title}
-              </h3>
-            </div>
-            
-            {/* Description and controls */}
-            <div className="flex w-full pr-3.5 pb-3 items-center">
-              <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-                {description}
-              </p>
-              
-              <div className="flex flex-col items-end gap-2 shrink-0">
-                {price && formatPrice(price)}
-                
-                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-                  <Switch 
-                    checked={enabled}
-                    onCheckedChange={(checked) => onToggle && onToggle(checked)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <CollapsibleContent className="px-3 pb-5 animate-accordion-down">
-          <div className="flex w-full max-w-full flex-col items-stretch">
-            <p className={`text-black text-sm font-normal leading-[23px] font-nunito-sans ${!enabled ? "opacity-50" : ""}`}>
-              STD Insurance provides income protection for short-term disabilities up to 26 weeks. 
-              It replaces a portion of your income while you recover from an illness or injury.
-            </p>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  }
-
-  // Compact version with icon for other plans
-  if (icon) {
-    return (
-      <article
-        className={`bg-white rounded-2xl border-2 border-[rgba(67,83,255,0.4)] ${className} ${!enabled ? "opacity-70" : ""}`}
-      >
-        <div className="flex w-full">
-          {/* Icon column - centered vertically and horizontally */}
-          <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
-            <img
-              src={icon}
-              alt={`${title} icon`}
-              className="w-10 h-10 object-contain"
-            />
-          </div>
-
-          {/* Content column */}
-          <div className="flex-grow flex flex-col">
-            {/* Title at the top */}
-            <div className="pt-4 pb-2">
-              <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-                {title}
-              </h3>
-            </div>
-            
-            {/* Description and controls */}
-            <div className="flex w-full pr-3.5 pb-3 items-center">
-              <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-                {description}
-              </p>
-              
-              <div className="flex flex-col items-end gap-2 shrink-0">
-                {price && formatPrice(price)}
-                
-                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-                  <Switch 
-                    checked={enabled}
-                    onCheckedChange={(checked) => onToggle && onToggle(checked)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  // Compact version without icon
   return (
-    <article
-      className={`bg-white rounded-2xl border-2 border-[rgba(67,83,255,0.4)] ${className} ${!enabled ? "opacity-70" : ""}`}
-    >
-      <div className="flex w-full px-3.5">
-        {/* Content column */}
-        <div className="flex-grow flex flex-col">
-          {/* Title at the top */}
-          <div className="pt-4 pb-2">
-            <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+    <div className={`bg-white shadow-[0px_16px_60px_0px_rgba(162,148,253,0.40)] rounded-2xl overflow-hidden`}>
+      <div 
+        className="flex w-full items-stretch justify-between px-[11px] py-[21px] cursor-pointer"
+        onClick={onExpand}
+      >
+        <div className="flex items-center gap-3">
+          {icon && (
+            <img
+              loading="lazy"
+              src={icon}
+              alt={title}
+              className="w-6 h-6 object-contain"
+            />
+          )}
+          <div className="flex flex-col">
+            <div className={`text-sm font-bold ${isExpanded ? "text-[rgba(67,83,255,1)]" : "text-black"}`}>
               {title}
-            </h3>
+            </div>
+            {description && !isExpanded && (
+              <div className="text-[10px] text-[rgba(67,83,255,1)] mt-[3px]">
+                {description}
+              </div>
+            )}
           </div>
-          
-          {/* Description and controls */}
-          <div className="flex w-full items-center pb-3">
-            <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className={`text-xs font-bold ${isExpanded ? "text-[rgba(67,83,255,1)]" : "text-black"}`}>
+            {price}
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={enabled}
+              onCheckedChange={onToggle}
+              onClick={(e) => e.stopPropagation()}
+              className="data-[state=checked]:bg-[rgba(67,83,255,1)]"
+            />
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </div>
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div 
+          className="px-[11px] pb-[21px] transition-all duration-300 ease-in-out"
+        >
+          {description && (
+            <p className="text-xs text-[rgba(67,83,255,1)] mb-4">
               {description}
             </p>
-            
-            <div className="flex flex-col items-end gap-2 shrink-0">
-              {price && formatPrice(price)}
-              
-              <div className="flex items-center">
-                <Switch 
-                  checked={enabled}
-                  onCheckedChange={(checked) => onToggle && onToggle(checked)}
-                />
-              </div>
+          )}
+          
+          {features.length > 0 && (
+            <div className="flex flex-col space-y-3">
+              {features.map((feature, index) => (
+                <InsurancePlanFeature key={index} feature={feature} />
+              ))}
             </div>
-          </div>
+          )}
         </div>
-      </div>
-    </article>
+      )}
+    </div>
   );
 };
