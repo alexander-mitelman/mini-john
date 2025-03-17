@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { 
@@ -158,10 +159,12 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
         }
       });
 
+      const promiseResults = await Promise.allSettled(requests);
       let hasFailures = false;
+      
       setQuotes(prev => {
         const updated = { ...prev };
-        for (const result of results) {
+        for (const result of promiseResults) {
           if (result.status === 'fulfilled') {
             updated[result.value.product as keyof ProductQuotes] = result.value.data;
           } else {
