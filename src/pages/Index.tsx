@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -10,7 +9,7 @@ import {
 } from "@/components/insurance";
 import { useQuotes } from "@/hooks/useQuotes";
 import { IndividualInfo } from "@/utils/insuranceApi";
-import { HeartPulse } from "lucide-react";
+import AuthErrorModal from "@/components/AuthErrorModal";
 
 const Index = () => {
   const { toast } = useToast();
@@ -34,7 +33,13 @@ const Index = () => {
   const [expandedProduct, setExpandedProduct] = useState<string | null>("ltd");
 
   // Get quotes from hook
-  const { quotes, loading, error } = useQuotes(userInfo, inputError);
+  const { 
+    quotes, 
+    loading, 
+    error, 
+    showAuthErrorModal, 
+    handleCloseAuthErrorModal 
+  } = useQuotes(userInfo, inputError);
 
   // Track which products are enabled
   const [enabledProducts, setEnabledProducts] = useState<Record<string, boolean>>({
@@ -196,6 +201,12 @@ const Index = () => {
 
   return (
     <main data-lov-name="main" className="bg-white flex max-w-[480px] w-full flex-col items-stretch mx-auto">
+      {/* Auth Error Modal */}
+      <AuthErrorModal 
+        isOpen={showAuthErrorModal} 
+        onClose={handleCloseAuthErrorModal} 
+      />
+
       <div className="mt-[33px] px-4">
         <UserInfoCard
           age={userInfo.age}

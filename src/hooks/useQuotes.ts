@@ -1,11 +1,16 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
-import { fetchWithToken, getToken, fetchToken } from '../services/authService';
+import { 
+  fetchWithToken, 
+  getToken, 
+  fetchToken, 
+  hasExceededMaxFailures, 
+  resetAuthFailureCount 
+} from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
 import { toast } from 'sonner';
-import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
 
 interface ProductQuotes {
   ltd: any | null;
@@ -52,6 +57,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const [error, setError] = useState<string | null>(null);
   const [initialFetchComplete, setInitialFetchComplete] = useState(false);
   const [tokenInitialized, setTokenInitialized] = useState(!!getToken());
+  const [showAuthErrorModal, setShowAuthErrorModal] = useState(hasExceededMaxFailures());
 
   const prevAgeRef = useRef(enrichedInfo.age);
   const prevSalaryRef = useRef(enrichedInfo.annualSalary);
@@ -63,6 +69,13 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   useEffect(() => {
     console.log('Component mounted, checking authentication status');
     
+    // Check for max failures at startup
+    if (hasExceededMaxFailures()) {
+      console.log('Maximum auth failures detected at startup');
+      setShowAuthErrorModal(true);
+      return;
+    }
+    
     const initializeAuth = async () => {
       if (!getToken()) {
         console.log('No token found, initiating token fetch');
@@ -71,6 +84,13 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           setTokenInitialized(true);
         } catch (err) {
           console.error('Error fetching initial token:', err);
+          
+          // Check if we've hit max failures after this attempt
+          if (hasExceededMaxFailures()) {
+            setShowAuthErrorModal(true);
+            return;
+          }
+          
           toast.error("Failed to authenticate. Retrying...");
           // Retry after a delay
           setTimeout(initializeAuth, 3000);
@@ -84,6 +104,18 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     initializeAuth();
   }, []);
 
+  // Check for auth failures on every render
+  useEffect(() => {
+    if (hasExceededMaxFailures() && !showAuthErrorModal) {
+      setShowAuthErrorModal(true);
+    }
+  }, [showAuthErrorModal]);
+
+  const handleCloseAuthErrorModal = useCallback(() => {
+    setShowAuthErrorModal(false);
+    resetAuthFailureCount(); // Optional: give them another chance
+  }, []);
+
   const fetchProducts = useCallback(async (productsToFetch: string[], individualInfo: Partial<IndividualInfo>) => {
     if (inputError) {
       return;
@@ -91,6 +123,12 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     
     if (!tokenInitialized) {
       console.log('Token not initialized yet, waiting...');
+      return;
+    }
+    
+    // Don't try to fetch if we've exceeded max failures
+    if (hasExceededMaxFailures()) {
+      setShowAuthErrorModal(true);
       return;
     }
     
@@ -111,6 +149,12 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           console.log('response', response, 'product', product);
           return { product, data: response.data };
         } catch (err) {
+          // Check if we hit max auth failures
+          if (err instanceof Error && err.message === 'MAX_AUTH_FAILURES_EXCEEDED') {
+            setShowAuthErrorModal(true);
+            throw err;
+          }
+          
           console.warn(`Error fetching ${product}:`, err);
           // Show toast for fetch errors
           toast.error(`Failed to fetch ${product} quote. Please try again.`);
@@ -138,6 +182,13 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       }
     } catch (err) {
       console.error('Error fetching product quotes:', err);
+      
+      // Check if it's our max failures error
+      if (err instanceof Error && err.message === 'MAX_AUTH_FAILURES_EXCEEDED') {
+        // Already handled by setting showAuthErrorModal
+        return;
+      }
+      
       if (err instanceof Error) {
         setError(err.message || 'Unknown error');
         toast.error("Failed to fetch quotes. Please try again.");
@@ -238,6 +289,8 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   return {
     quotes,
     loading,
-    error
+    error,
+    showAuthErrorModal,
+    handleCloseAuthErrorModal
   };
 }
