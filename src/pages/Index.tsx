@@ -1,10 +1,10 @@
+
 import React, { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   UserInfoCard,
   InsurancePlanCard,
   InsuranceSummary,
-  CTAButton,
   EditUserInfoDialog,
 } from "@/components/insurance";
 import { useQuotes } from "@/hooks/useQuotes";
@@ -117,15 +117,6 @@ const Index = () => {
         description: "Recalculating your insurance quotes based on new information.",
       });
     }
-  };
-
-  const handleGetQuote = () => {
-    // In a real app, this would navigate to the quote page
-    console.log("Get quote clicked");
-    toast({
-      title: "Quote requested",
-      description: "Your personalized quote is being prepared.",
-    });
   };
 
   // Features content for each product
@@ -344,17 +335,10 @@ const Index = () => {
             />
           </div>
 
-          <div className="mt-4 px-4">
+          <div className="mt-4 px-4 mb-4">
             <InsuranceSummary 
               weeklyPrice={`$${totalWeeklyPrice}`} 
               hoursOfWork={calculateHoursOfWork()} 
-            />
-          </div>
-
-          <div className="mt-4 px-4 mb-4">
-            <CTAButton
-              text="Get Your Personalized Quote"
-              onClick={handleGetQuote}
             />
           </div>
         </>
