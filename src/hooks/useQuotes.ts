@@ -48,6 +48,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
 
   const prevAgeRef = useRef(enrichedInfo.age);
   const prevSalaryRef = useRef(enrichedInfo.annualSalary);
@@ -125,6 +126,35 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     [fetchProducts]
   );
 
+  // Initial fetch of all products when component mounts
+  useEffect(() => {
+    const fetchAllProductsOnMount = async () => {
+      if (!initialFetchComplete && !inputError) {
+        console.log('Performing initial fetch of all products');
+        const allProducts = Object.keys(productConfig);
+        
+        // Wait for token to be available
+        const waitForToken = async () => {
+          if (!getToken()) {
+            console.log('Waiting for token to be available...');
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return waitForToken();
+          }
+          return true;
+        };
+        
+        await waitForToken();
+        
+        // Now fetch all products
+        await fetchProducts(allProducts, enrichedInfo);
+        setInitialFetchComplete(true);
+      }
+    };
+    
+    fetchAllProductsOnMount();
+  }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError]);
+
+  // Update products when user info changes
   useEffect(() => {
     const changedAge = enrichedInfo.age !== prevAgeRef.current;
     const changedSalary = enrichedInfo.annualSalary !== prevSalaryRef.current;
