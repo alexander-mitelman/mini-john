@@ -182,7 +182,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
       >
         <div className="flex w-full" onClick={handleCardClick}>
           {/* Icon column - centered vertically and horizontally */}
-          <div className="flex-shrink-0 flex items-center justify-center py-3 pl-3.5 pr-2">
+          <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
             <img
               src="/lovable-uploads/a5306ff3-7263-4423-87ad-d4f5af4145cb.png"
               alt={`${title} icon`}
@@ -191,16 +191,16 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           </div>
 
           {/* Content column */}
-          <div className="flex-grow flex flex-col pr-3.5">
+          <div className="flex-grow flex flex-col">
             {/* Title at the top */}
-            <div className="pt-3 pb-2">
+            <div className="pt-4 pb-2">
               <h3 className={`${isExpanded ? "text-[#9b87f5]" : "text-[rgba(67,83,255,1)]"} text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
                 {title}
               </h3>
             </div>
             
             {/* Description and controls */}
-            <div className="flex w-full items-center pb-3">
+            <div className="flex w-full pr-3.5 pb-3 items-center">
               <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
                 {description}
               </p>
@@ -235,11 +235,11 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   if (icon) {
     return (
       <article
-        className={`bg-white rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 ${className} ${!enabled ? "opacity-70" : ""}`}
+        className={`bg-white rounded-2xl border-2 border-[rgba(67,83,255,0.4)] ${className} ${!enabled ? "opacity-70" : ""}`}
       >
         <div className="flex w-full">
           {/* Icon column - centered vertically and horizontally */}
-          <div className="flex-shrink-0 flex items-center justify-center py-3 pl-3.5 pr-2">
+          <div className="flex-shrink-0 py-4 pl-3.5 pr-2 flex items-center justify-center">
             <img
               src={icon}
               alt={`${title} icon`}
@@ -248,16 +248,16 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           </div>
 
           {/* Content column */}
-          <div className="flex-grow flex flex-col pr-3.5">
+          <div className="flex-grow flex flex-col">
             {/* Title at the top */}
-            <div className="pt-3 pb-2">
+            <div className="pt-4 pb-2">
               <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
                 {title}
               </h3>
             </div>
             
             {/* Description and controls */}
-            <div className="flex w-full items-center pb-3">
+            <div className="flex w-full pr-3.5 pb-3 items-center">
               <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
                 {description}
               </p>
@@ -265,7 +265,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               <div className="flex flex-col items-end gap-2 shrink-0">
                 {price && formatPrice(price)}
                 
-                <div className="flex items-center">
+                <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
                   <Switch 
                     checked={enabled}
                     onCheckedChange={(checked) => onToggle && onToggle(checked)}
@@ -282,29 +282,34 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   // Compact version without icon
   return (
     <article
-      className={`bg-white flex flex-col px-[70px] py-3 rounded-2xl border-[rgba(67,83,255,0.4)] border-solid border-2 max-md:px-5 ${className} ${!enabled ? "opacity-70" : ""}`}
+      className={`bg-white rounded-2xl border-2 border-[rgba(67,83,255,0.4)] ${className} ${!enabled ? "opacity-70" : ""}`}
     >
-      {/* Title at the top */}
-      <div className="pb-2">
-        <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
-          {title}
-        </h3>
-      </div>
-      
-      {/* Main row with description, price, switch */}
-      <div className="flex items-center">
-        <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
-          {description}
-        </p>
-        
-        <div className="flex flex-col items-end gap-2 shrink-0">
-          {price && formatPrice(price)}
+      <div className="flex w-full px-3.5">
+        {/* Content column */}
+        <div className="flex-grow flex flex-col">
+          {/* Title at the top */}
+          <div className="pt-4 pb-2">
+            <h3 className={`text-[rgba(67,83,255,1)] text-base font-bold leading-none font-nunito-sans font-[700] ${!enabled ? "opacity-50" : ""}`}>
+              {title}
+            </h3>
+          </div>
           
-          <div className="flex items-center">
-            <Switch 
-              checked={enabled}
-              onCheckedChange={(checked) => onToggle && onToggle(checked)}
-            />
+          {/* Description and controls */}
+          <div className="flex w-full items-center pb-3">
+            <p className={`text-[#6C757D] text-xs font-normal leading-loose font-nunito-sans font-[400] mr-auto ${!enabled ? "opacity-50" : ""}`}>
+              {description}
+            </p>
+            
+            <div className="flex flex-col items-end gap-2 shrink-0">
+              {price && formatPrice(price)}
+              
+              <div className="flex items-center">
+                <Switch 
+                  checked={enabled}
+                  onCheckedChange={(checked) => onToggle && onToggle(checked)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
