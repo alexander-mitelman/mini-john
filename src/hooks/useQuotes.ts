@@ -135,11 +135,10 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       const requests = productsToFetch.map(async (product) => {
         const { buildUrl } = productConfig[product as keyof typeof productConfig];
         const pathname = buildUrl(individualInfo as IndividualInfo);
-        let url = URI_SETTINGS.quote() + pathname;
         
-        if (isDistributor(BABRM)) {
-          url += ((url.includes('?') ? '&' : '?') + 'a=babrm');
-        }
+        // Always append the 'a=babrm' parameter
+        let url = URI_SETTINGS.quote() + pathname;
+        url += ((url.includes('?') ? '&' : '?') + 'a=babrm');
 
         try {
           console.log(`Fetching ${product} from URL:`, url);
@@ -151,15 +150,22 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           
           // Ensure we have proper price formatting
           if (extractedQuota) {
+            // If we have a price value that's a number, convert it to weekly price
             if (extractedQuota.price && typeof extractedQuota.price === 'number') {
-              extractedQuota.price = `$${extractedQuota.price.toFixed(2)}/week`;
-            } else if (!extractedQuota.price && extractedQuota.weeklyPrice) {
+              // Divide by 4 to convert monthly to weekly
+              extractedQuota.weeklyPrice = parseFloat((extractedQuota.price / 4).toFixed(2));
+              extractedQuota.price = `$${extractedQuota.weeklyPrice.toFixed(2)}/week`;
+            } 
+            // If we have a weeklyPrice but no formatted price
+            else if (!extractedQuota.price && extractedQuota.weeklyPrice) {
+              // Ensure weeklyPrice is divided by 4 to convert monthly to weekly
+              extractedQuota.weeklyPrice = parseFloat((extractedQuota.weeklyPrice / 4).toFixed(2));
               extractedQuota.price = `$${extractedQuota.weeklyPrice.toFixed(2)}/week`;
             }
             
             // Make sure weeklyPrice is a number if it exists
             if (extractedQuota.weeklyPrice && typeof extractedQuota.weeklyPrice === 'string') {
-              extractedQuota.weeklyPrice = parseFloat(extractedQuota.weeklyPrice.replace(/[^\d.]/g, ''));
+              extractedQuota.weeklyPrice = parseFloat(extractedQuota.weeklyPrice.replace(/[^\d.]/g, '')) / 4;
             }
           }
           

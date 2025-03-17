@@ -1,131 +1,81 @@
-/**
- * Extracts quota information from server response with priority:
- * 1. Premium plan individual if exists
- * 2. Basic plan individual if exists
- * 3. Direct response if it's already a quota object
- */
-export const extractQuota = (responseData: any): any | null => {
-  if (!responseData) return null;
+
+export const extractQuota = (data: any) => {
+  console.log('Extracting quota from data:', data);
   
-  console.log("Extracting quota from:", responseData);
-  
-  // Check if premium plan with individual exists
-  if (responseData.premium && responseData.premium.individual !== undefined) {
-    console.log("Using premium.individual:", responseData.premium.individual);
-    
-    // Create a standardized response
-    return {
-      price: `$${responseData.premium.individual.toFixed(2)}/week`,
-      weeklyPrice: responseData.premium.individual,
-    };
+  // If data is null or undefined
+  if (!data) {
+    console.log('Data is null or undefined');
+    return null;
   }
   
-  // Check if basic plan with individual exists
-  if (responseData.basic && responseData.basic.individual !== undefined) {
-    console.log("Using basic.individual:", responseData.basic.individual);
+  try {
+    // Case 1: If data already has price, weeklyPrice, and features
+    if (data.price !== undefined || data.weeklyPrice !== undefined) {
+      console.log('Data already has price or weeklyPrice property');
+      
+      // Convert monthly price to weekly if weeklyPrice exists
+      if (data.weeklyPrice) {
+        // Divide by 4 to convert monthly to weekly
+        data.weeklyPrice = parseFloat((data.weeklyPrice / 4).toFixed(2));
+      }
+      
+      return data;
+    }
     
-    // Create a standardized response
-    return {
-      price: `$${responseData.basic.individual.toFixed(2)}/week`,
-      weeklyPrice: responseData.basic.individual,
-    };
-  }
-  
-  // If it's the old structure with plans.premium or plans.basic
-  if (responseData.plans) {
-    if (responseData.plans.premium) {
-      const premium = responseData.plans.premium;
-      console.log("Using plans.premium:", premium);
+    // Case 2: If data has "premium" and "individual" structure
+    if (data.premium && data.premium.individual !== undefined) {
+      console.log('Found premium.individual:', data.premium.individual);
       
-      // If premium has individual property
-      if (premium.individual !== undefined) {
-        return {
-          price: `$${premium.individual.toFixed(2)}/week`,
-          weeklyPrice: premium.individual,
-        };
-      }
+      // Extract monthly premium and convert to weekly
+      const monthlyPrice = data.premium.individual;
+      const weeklyPrice = parseFloat((monthlyPrice / 4).toFixed(2));
       
-      // Otherwise use the whole premium object
-      if (typeof premium === 'number') {
-        return {
-          price: `$${premium.toFixed(2)}/week`,
-          weeklyPrice: premium,
-        };
-      }
+      return {
+        price: `$${weeklyPrice.toFixed(2)}/week`,
+        weeklyPrice: weeklyPrice,
+        features: data.features || []
+      };
+    }
+    
+    // Case 3: If data has "basic" and no "premium"
+    if (!data.premium && data.basic && data.basic.individual !== undefined) {
+      console.log('Found basic.individual:', data.basic.individual);
       
-      // Ensure weeklyPrice is set if price exists but weeklyPrice doesn't
-      if (premium.price && !premium.weeklyPrice) {
-        if (typeof premium.price === 'number') {
-          premium.weeklyPrice = premium.price;
-        } else if (typeof premium.price === 'string') {
-          const priceValue = parseFloat(premium.price.replace(/[^\d.]/g, ''));
-          premium.weeklyPrice = priceValue;
+      // Extract monthly basic price and convert to weekly
+      const monthlyPrice = data.basic.individual;
+      const weeklyPrice = parseFloat((monthlyPrice / 4).toFixed(2));
+      
+      return {
+        price: `$${weeklyPrice.toFixed(2)}/week`,
+        weeklyPrice: weeklyPrice,
+        features: data.features || []
+      };
+    }
+    
+    // Case 4: If data has direct price property
+    if (typeof data === 'object' && Object.keys(data).length > 0) {
+      // Try to find any numeric property that could be a price
+      for (const key in data) {
+        if (typeof data[key] === 'number') {
+          console.log(`Found numeric property ${key}:`, data[key]);
+          
+          // Convert monthly to weekly
+          const monthlyPrice = data[key];
+          const weeklyPrice = parseFloat((monthlyPrice / 4).toFixed(2));
+          
+          return {
+            price: `$${weeklyPrice.toFixed(2)}/week`,
+            weeklyPrice: weeklyPrice,
+            features: []
+          };
         }
       }
-      
-      return premium;
     }
     
-    if (responseData.plans.basic) {
-      const basic = responseData.plans.basic;
-      console.log("Using plans.basic:", basic);
-      
-      // If basic has individual property
-      if (basic.individual !== undefined) {
-        return {
-          price: `$${basic.individual.toFixed(2)}/week`,
-          weeklyPrice: basic.individual,
-        };
-      }
-      
-      // Otherwise use the whole basic object
-      if (typeof basic === 'number') {
-        return {
-          price: `$${basic.toFixed(2)}/week`,
-          weeklyPrice: basic,
-        };
-      }
-      
-      // Ensure weeklyPrice is set if price exists but weeklyPrice doesn't
-      if (basic.price && !basic.weeklyPrice) {
-        if (typeof basic.price === 'number') {
-          basic.weeklyPrice = basic.price;
-        } else if (typeof basic.price === 'string') {
-          const priceValue = parseFloat(basic.price.replace(/[^\d.]/g, ''));
-          basic.weeklyPrice = priceValue;
-        }
-      }
-      
-      return basic;
-    }
+    console.log('Could not extract quota from data');
+    return null;
+  } catch (error) {
+    console.error('Error extracting quota:', error);
+    return null;
   }
-  
-  // If data is already in the expected format with price or weeklyPrice
-  if (responseData.price || responseData.weeklyPrice) {
-    console.log("Using direct response with price:", responseData);
-    
-    // Ensure weeklyPrice is set if price exists but weeklyPrice doesn't
-    if (responseData.price && !responseData.weeklyPrice) {
-      if (typeof responseData.price === 'number') {
-        responseData.weeklyPrice = responseData.price;
-      } else if (typeof responseData.price === 'string') {
-        const priceValue = parseFloat(responseData.price.replace(/[^\d.]/g, ''));
-        responseData.weeklyPrice = priceValue;
-      }
-    }
-    
-    return responseData;
-  }
-  
-  // If responseData itself is a number, assume it's the price
-  if (typeof responseData === 'number') {
-    console.log("Response is a direct number:", responseData);
-    return {
-      price: `$${responseData.toFixed(2)}/week`,
-      weeklyPrice: responseData
-    };
-  }
-  
-  console.log("Could not extract quote from response data");
-  return null;
 };

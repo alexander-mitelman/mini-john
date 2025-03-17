@@ -185,8 +185,12 @@ const calculateAdjustedPrice = (
     adjustmentFactor += (zipFirstDigit % 5) * 0.02; // Up to 8% adjustment based on zip
   }
   
-  const weeklyPrice = baseProduct.weeklyPrice ? 
+  // Calculate the monthly price and then divide by 4 to get weekly price
+  const monthlyPrice = baseProduct.weeklyPrice ? 
     parseFloat((baseProduct.weeklyPrice * adjustmentFactor).toFixed(2)) : 0;
+  
+  // Convert to weekly price (monthly price divided by 4)
+  const weeklyPrice = parseFloat((monthlyPrice / 4).toFixed(2));
   
   return {
     ...baseProduct,
