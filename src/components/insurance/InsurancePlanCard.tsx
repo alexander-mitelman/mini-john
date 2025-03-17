@@ -64,14 +64,25 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   const formatPrice = () => {
     // Make sure price is a string and has the expected format
     const priceStr = typeof price === 'string' ? price : `$0.00/week`;
-    const priceValue = priceStr.split('/')[0] || '$0.00';
+    
+    // Check if the string contains a slash (e.g., "$25.00/week")
+    let priceValue = '$0.00';
+    let interval = '/week';
+    
+    if (priceStr.includes('/')) {
+      [priceValue, interval] = priceStr.split('/');
+      interval = '/' + interval;
+    } else {
+      // If there's no slash, use the whole string as the price value
+      priceValue = priceStr;
+    }
     
     return (
       <div className="flex flex-col items-end">
         <span className={`text-sm font-bold ${isExpanded ? 'text-[#4361EE]' : 'text-[#000000]'}`}>
           {priceValue}
         </span>
-        <span className="text-xs text-gray-500">/week</span>
+        <span className="text-xs text-gray-500">{interval}</span>
       </div>
     );
   };
