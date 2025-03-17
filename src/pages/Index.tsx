@@ -74,11 +74,14 @@ const Index = () => {
   const totalWeeklyPrice = Object.entries(quotes)
     .reduce((sum, [key, product]) => {
       if (enabledProducts[key] && product && product.weeklyPrice) {
-        return sum + (product.weeklyPrice || 0);
+        console.log(`Adding ${key} price:`, product.weeklyPrice);
+        return sum + (parseFloat(product.weeklyPrice) || 0);
       }
       return sum;
     }, 0)
     .toFixed(2);
+
+  console.log("Total weekly price calculated:", totalWeeklyPrice);
 
   // Hours of work calculation based on income
   const calculateHoursOfWork = () => {
@@ -228,6 +231,12 @@ const Index = () => {
         <div className="flex justify-center items-center py-10">
           <div className="animate-pulse text-center text-gray-500">
             Loading insurance options...
+          </div>
+        </div>
+      ) : error ? (
+        <div className="flex justify-center items-center py-10">
+          <div className="text-center text-red-500">
+            {error}
           </div>
         </div>
       ) : (

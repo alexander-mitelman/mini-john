@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Check, ChevronDown, ChevronUp, Accessibility, HandMetal } from "lucide-react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 
@@ -31,6 +31,8 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   onExpand = () => {},
   className,
 }) => {
+  console.log(`Rendering ${title} with price:`, price);
+  
   // Determine which icon to use for LTD and STD
   const renderIcon = () => {
     if (icon) {
@@ -60,7 +62,10 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 
   // Format price to display in two rows
   const formatPrice = () => {
-    const priceValue = price.split('/')[0];
+    // Make sure price is a string and has the expected format
+    const priceStr = typeof price === 'string' ? price : `$0.00/week`;
+    const priceValue = priceStr.split('/')[0] || '$0.00';
+    
     return (
       <div className="flex flex-col items-end">
         <span className={`text-sm font-bold ${isExpanded ? 'text-[#4361EE]' : 'text-[#000000]'}`}>

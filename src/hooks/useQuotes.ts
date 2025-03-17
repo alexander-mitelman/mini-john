@@ -131,6 +131,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     setLoading(true);
     setError(null);
     try {
+      console.log("Fetching products:", productsToFetch);
       const requests = productsToFetch.map(async (product) => {
         const { buildUrl } = productConfig[product as keyof typeof productConfig];
         const pathname = buildUrl(individualInfo as IndividualInfo);
@@ -141,10 +142,26 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
         }
 
         try {
+          console.log(`Fetching ${product} from URL:`, url);
           const response = await fetchWithToken(url);
-          console.log('response', response, 'product', product);
+          console.log(`${product} response:`, response.data);
           
           const extractedQuota = extractQuota(response.data);
+          console.log(`${product} extracted quota:`, extractedQuota);
+          
+          // Ensure we have proper price formatting
+          if (extractedQuota) {
+            if (extractedQuota.price && typeof extractedQuota.price === 'number') {
+              extractedQuota.price = `$${extractedQuota.price.toFixed(2)}/week`;
+            } else if (!extractedQuota.price && extractedQuota.weeklyPrice) {
+              extractedQuota.price = `$${extractedQuota.weeklyPrice.toFixed(2)}/week`;
+            }
+            
+            // Make sure weeklyPrice is a number if it exists
+            if (extractedQuota.weeklyPrice && typeof extractedQuota.weeklyPrice === 'string') {
+              extractedQuota.weeklyPrice = parseFloat(extractedQuota.weeklyPrice.replace(/[^\d.]/g, ''));
+            }
+          }
           
           return { product, data: extractedQuota };
         } catch (err) {
@@ -162,6 +179,8 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       const promiseResults = await Promise.allSettled(requests);
       let hasFailures = false;
       
+      console.log("All products fetch results:", promiseResults);
+      
       setQuotes(prev => {
         const updated = { ...prev };
         for (const result of promiseResults) {
@@ -171,6 +190,8 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
             hasFailures = true;
           }
         }
+        
+        console.log("Updated quotes:", updated);
         return updated;
       });
       
