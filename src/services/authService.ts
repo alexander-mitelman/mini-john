@@ -46,7 +46,7 @@ export async function fetchToken(): Promise<string> {
 }
 
 // Generic function to make an authenticated request
-// If we get a 401 with "The incoming token has expired", refresh & retry
+// If we get a 401 or any network error, refresh & retry
 export async function fetchWithToken(url: string, config = { headers: {} }): Promise<any> {
   let token = getToken();
   
@@ -74,6 +74,7 @@ export async function fetchWithToken(url: string, config = { headers: {} }): Pro
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
     
+    // If unauthorized (401) or network error, refresh token and retry
     if (axiosError.response?.status === 401 || axiosError.code === 'ERR_NETWORK') {
       console.error('Token has expired or network error, refreshing token...');
       // Refresh the token

@@ -4,6 +4,8 @@ import { debounce } from '../utils/debounce';
 import { fetchWithToken, getToken, fetchToken } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
+import { toast } from 'sonner';
+import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
 
 interface ProductQuotes {
   ltd: any | null;
@@ -49,6 +51,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialFetchComplete, setInitialFetchComplete] = useState(false);
+  const [tokenInitialized, setTokenInitialized] = useState(!!getToken());
 
   const prevAgeRef = useRef(enrichedInfo.age);
   const prevSalaryRef = useRef(enrichedInfo.annualSalary);
@@ -56,23 +59,41 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const prevEmployeeCoverageRef = useRef(enrichedInfo.employeeCoverage);
   const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
 
+  // Initialize authentication on component mount
   useEffect(() => {
     console.log('Component mounted, checking authentication status');
     
-    if (!getToken()) {
-      console.log('No token found, initiating token fetch');
-      fetchToken().catch(err => {
-        console.error('Error fetching initial token:', err);
-      });
-    } else {
-      console.log('Token already exists in localStorage');
-    }
+    const initializeAuth = async () => {
+      if (!getToken()) {
+        console.log('No token found, initiating token fetch');
+        try {
+          await fetchToken();
+          setTokenInitialized(true);
+        } catch (err) {
+          console.error('Error fetching initial token:', err);
+          toast.error("Failed to authenticate. Retrying...");
+          // Retry after a delay
+          setTimeout(initializeAuth, 3000);
+        }
+      } else {
+        console.log('Token already exists in localStorage');
+        setTokenInitialized(true);
+      }
+    };
+    
+    initializeAuth();
   }, []);
 
   const fetchProducts = useCallback(async (productsToFetch: string[], individualInfo: Partial<IndividualInfo>) => {
     if (inputError) {
       return;
     }
+    
+    if (!tokenInitialized) {
+      console.log('Token not initialized yet, waiting...');
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
@@ -85,39 +106,46 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           url += ((url.includes('?') ? '&' : '?') + 'a=babrm');
         }
 
-        let response;
         try {
-          response = await fetchWithToken(url);
+          const response = await fetchWithToken(url);
           console.log('response', response, 'product', product);
           return { product, data: response.data };
-        } catch {
-          console.warn(`Unexpected status for ${product}:`, response?.status);
+        } catch (err) {
+          console.warn(`Error fetching ${product}:`, err);
+          // Show toast for fetch errors
+          toast.error(`Failed to fetch ${product} quote. Please try again.`);
           return { product, data: null };
         }
       });
 
       const results = await Promise.allSettled(requests);
 
+      let hasFailures = false;
       setQuotes(prev => {
         const updated = { ...prev };
-        for (const productResult of results) {
-          if (productResult.status === 'rejected') {
-            updated[productResult.reason.product as keyof ProductQuotes] = productResult.reason.data;
+        for (const result of results) {
+          if (result.status === 'fulfilled') {
+            updated[result.value.product as keyof ProductQuotes] = result.value.data;
           } else {
-            updated[productResult.value.product as keyof ProductQuotes] = productResult.value.data;
+            hasFailures = true;
           }
         }
         return updated;
       });
+      
+      if (hasFailures) {
+        setError('Some quotes failed to load. Please try again later.');
+      }
     } catch (err) {
       console.error('Error fetching product quotes:', err);
       if (err instanceof Error) {
         setError(err.message || 'Unknown error');
+        toast.error("Failed to fetch quotes. Please try again.");
       }
     } finally {
       setLoading(false);
     }
-  }, [inputError]);
+  }, [inputError, tokenInitialized]);
 
   const debouncedFetchProducts = useCallback(
     debounce((productsToFetch, values) => {
@@ -129,30 +157,27 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   // Initial fetch of all products when component mounts
   useEffect(() => {
     const fetchAllProductsOnMount = async () => {
-      if (!initialFetchComplete && !inputError) {
+      if (!initialFetchComplete && !inputError && tokenInitialized) {
         console.log('Performing initial fetch of all products');
         const allProducts = Object.keys(productConfig);
         
-        // Wait for token to be available
-        const waitForToken = async () => {
-          if (!getToken()) {
-            console.log('Waiting for token to be available...');
-            await new Promise(resolve => setTimeout(resolve, 100));
-            return waitForToken();
-          }
-          return true;
-        };
-        
-        await waitForToken();
-        
-        // Now fetch all products
-        await fetchProducts(allProducts, enrichedInfo);
-        setInitialFetchComplete(true);
+        try {
+          await fetchProducts(allProducts, enrichedInfo);
+          setInitialFetchComplete(true);
+        } catch (err) {
+          console.error('Error during initial fetch:', err);
+          // Retry initial fetch after delay if it fails
+          setTimeout(() => {
+            if (!initialFetchComplete) {
+              fetchAllProductsOnMount();
+            }
+          }, 5000);
+        }
       }
     };
     
     fetchAllProductsOnMount();
-  }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError]);
+  }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError, tokenInitialized]);
 
   // Update products when user info changes
   useEffect(() => {
@@ -188,7 +213,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       }
     }
 
-    if (productsToFetch.length > 0) {
+    if (productsToFetch.length > 0 && tokenInitialized) {
       debouncedFetchProducts(productsToFetch, {
         age: enrichedInfo.age,
         annualSalary: enrichedInfo.annualSalary,
@@ -208,7 +233,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       // debouncedFetchProducts.cancel();
     };
   }, [enrichedInfo.age, enrichedInfo.annualSalary, enrichedInfo.zipCode, 
-    enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident]);
+    enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident, tokenInitialized]);
 
   return {
     quotes,
