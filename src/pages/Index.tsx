@@ -187,10 +187,10 @@ const Index = () => {
     ltd: "Protect Your Income When You Need It Most",
     std: "Short-Term Coverage For Immediate Needs",
     life: "Financial Protection For Your Loved Ones",
-    dental: "Comprehensive Oral Health Coverage",
-    vision: "Complete Eye Care Solutions",
-    accident: "Protection For The Unexpected",
-    critical: "Support During Serious Health Events"
+    dental: "Coverage for routine dental care and procedures",
+    vision: "Coverage for eye exams and vision correction",
+    accident: "Financial help if you experience a covered accident",
+    critical: "Financial protection for serious illness"
   };
 
   return (
