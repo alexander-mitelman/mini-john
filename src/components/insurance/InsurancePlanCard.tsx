@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, HeartPulse, Umbrella } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { InsurancePlanFeature } from "./InsurancePlanFeature";
 
@@ -29,6 +29,23 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   onExpand = () => {},
   className,
 }) => {
+  // Determine which icon to use for LTD and STD
+  const renderIcon = () => {
+    if (icon) {
+      return <img
+        loading="lazy"
+        src={icon}
+        alt={title}
+        className="w-6 h-6 object-contain"
+      />;
+    } else if (title.includes("Long-Term Disability")) {
+      return <HeartPulse className="w-6 h-6 text-[#4361EE]" />;
+    } else if (title.includes("Short-Term Disability")) {
+      return <Umbrella className="w-6 h-6 text-[#4361EE]" />;
+    }
+    return null;
+  };
+
   return (
     <div className={`bg-white rounded-xl overflow-hidden border border-[#E2E8F0] shadow-sm ${className}`}>
       <div 
@@ -36,23 +53,11 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         onClick={onExpand}
       >
         <div className="flex items-center gap-3">
-          {icon && (
-            <img
-              loading="lazy"
-              src={icon}
-              alt={title}
-              className="w-6 h-6 object-contain"
-            />
-          )}
+          {renderIcon()}
           <div className="flex flex-col">
             <div className="text-sm font-bold text-[#4361EE]">
               {title}
             </div>
-            {description && !isExpanded && (
-              <div className="text-xs text-gray-600 mt-1">
-                {description}
-              </div>
-            )}
           </div>
         </div>
         <div className="flex items-center gap-3">
