@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -45,7 +44,9 @@ const formSchema = z.object({
     ),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema> & {
+  zipPrefixChanged?: boolean;
+};
 
 interface EditUserInfoDialogProps {
   isOpen: boolean;
@@ -70,10 +71,9 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
   const zipCodeInputRef = useRef<HTMLInputElement>(null);
   const incomeInputRef = useRef<HTMLInputElement>(null);
   
-  // Track the first 3 digits of zip code to determine if an API call is needed
   const [zipPrefix, setZipPrefix] = useState<string>("");
 
-  const form = useForm<FormValues>({
+  const form = useForm<Omit<FormValues, 'zipPrefixChanged'>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       age: initialValues.age,
@@ -82,7 +82,6 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
     },
   });
 
-  // Reset form when initialValues change
   useEffect(() => {
     if (isOpen) {
       form.reset({
@@ -90,12 +89,10 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
         zipCode: initialValues.zipCode,
         income: initialValues.income.replace(/\$|,/g, ""),
       });
-      // Store initial zip prefix
       setZipPrefix(initialValues.zipCode.slice(0, 3));
     }
   }, [initialValues, isOpen, form]);
 
-  // Focus the appropriate field when the dialog opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -106,22 +103,19 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
         } else if (focusField === 'income' && incomeInputRef.current) {
           incomeInputRef.current.focus();
         }
-      }, 100); // Short delay to ensure the dialog is fully open
+      }, 100);
     }
   }, [isOpen, focusField]);
 
-  const handleSubmit = (values: FormValues) => {
-    // Format the income to include $ and commas
+  const handleSubmit = (values: Omit<FormValues, 'zipPrefixChanged'>) => {
     const formattedIncome = `$${Number(values.income).toLocaleString()}`;
     
-    // Check if zip prefix has changed
     const newZipPrefix = values.zipCode.slice(0, 3);
     const zipPrefixChanged = newZipPrefix !== zipPrefix;
     
     onSubmit({
       ...values,
       income: formattedIncome,
-      // Add metadata to indicate if zip prefix changed
       zipPrefixChanged,
     });
   };
@@ -150,7 +144,6 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                       max="150"
                       {...field} 
                       ref={(e) => {
-                        // Handle both refs
                         field.ref(e);
                         ageInputRef.current = e;
                       }}
@@ -176,7 +169,6 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                         zipCodeInputRef.current = e;
                       }}
                       onChange={(e) => {
-                        // Only allow digits and hyphen
                         const value = e.target.value.replace(/[^\d-]/g, '');
                         field.onChange(value);
                       }}
@@ -201,7 +193,6 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                         incomeInputRef.current = e;
                       }}
                       onChange={(e) => {
-                        // Only allow digits
                         const value = e.target.value.replace(/\D/g, '');
                         field.onChange(value);
                       }}
