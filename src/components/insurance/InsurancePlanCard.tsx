@@ -88,7 +88,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
   };
 
   return (
-    <div className={`bg-white rounded-xl overflow-hidden shadow-sm ${isExpanded ? 'border-2 border-[#4361EE]' : 'border border-[#E2E8F0]'} ${className}`}>
+    <div className={`${isExpanded ? 'bg-[rgba(67,83,255,0.05)]' : 'bg-white'} rounded-xl overflow-hidden shadow-sm ${isExpanded ? 'border-2 border-[#4361EE]' : 'border border-[#E2E8F0]'} ${className}`}>
       <div 
         className="flex w-full items-center justify-between p-4 cursor-pointer"
         onClick={onExpand}
