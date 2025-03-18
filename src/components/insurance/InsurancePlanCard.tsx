@@ -122,7 +122,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
 
       {isExpanded && (
         <div 
-          className="px-4 pb-4 bg-[rgba(67,83,255,0.05)]"
+          className="px-4 pb-4"
         >
           {description && (
             <p className="text-sm text-gray-700 mb-4">
