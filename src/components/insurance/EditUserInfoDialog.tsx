@@ -25,10 +25,10 @@ const formSchema = z.object({
   age: z.coerce.number().min(0, "Age must be at least 0").max(150, "Age must be less than 150"),
   zipCode: z.string().refine(
     (value) => {
-      const zipCodeRegex = /^(\d{5}|\d{5}-\d{4})?$/;
+      const zipCodeRegex = /^\d{5}$/;
       return zipCodeRegex.test(value);
     }, 
-    { message: "Zip code must be a valid US postal code (12345 or 12345-1234) or left blank." }
+    { message: "Zip code must be a 5-digit number" }
   ),
   income: z.string()
     .refine(
@@ -162,14 +162,14 @@ export const EditUserInfoDialog: React.FC<EditUserInfoDialogProps> = ({
                   <FormControl>
                     <Input 
                       {...field} 
-                      maxLength={10}
+                      maxLength={5}
                       placeholder="Enter 5-digit zip code"
                       ref={(e) => {
                         field.ref(e);
                         zipCodeInputRef.current = e;
                       }}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/[^\d-]/g, '');
+                        const value = e.target.value.replace(/[^\d]/g, '').slice(0, 5);
                         field.onChange(value);
                       }}
                     />
