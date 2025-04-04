@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   UserInfoCard,
@@ -10,16 +10,20 @@ import {
 import { useQuotes } from "@/hooks/useQuotes";
 import { IndividualInfo } from "@/utils/insuranceApi";
 import AuthErrorModal from "@/components/AuthErrorModal";
+import { parseUrlParams } from "@/utils/urlParamsUtils";
 
 const Index = () => {
   const { toast } = useToast();
 
+  // Parse URL parameters on component mount
+  const [initialUrlParams] = useState(() => parseUrlParams());
+
   // User information state
   const [userInfo, setUserInfo] = useState<IndividualInfo>({
-    age: 46,
-    zipCode: "12345",
-    income: "$200,000",
-    annualSalary: 200000,
+    age: initialUrlParams.age || 46,
+    zipCode: initialUrlParams.zipCode || "12345",
+    income: initialUrlParams.annualSalary ? `$${initialUrlParams.annualSalary.toLocaleString()}` : "$200,000",
+    annualSalary: initialUrlParams.annualSalary || 200000,
     employeeCoverage: 20000,
     spouseCoverage: 10000,
   });
