@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { 
@@ -66,6 +65,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const prevZipRef = useRef(enrichedInfo.zipCode);
   const prevEmployeeCoverageRef = useRef(enrichedInfo.employeeCoverage);
   const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
+  const zipPrefixChangedRef = useRef(false);
 
   useEffect(() => {
     console.log('Component mounted, checking authentication status');
@@ -253,7 +253,16 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   useEffect(() => {
     const changedAge = enrichedInfo.age !== prevAgeRef.current;
     const changedSalary = enrichedInfo.annualSalary !== prevSalaryRef.current;
-    const changedZip = enrichedInfo.zipCode !== prevZipRef.current;
+    const changedZip = enrichedInfo.zipCode !== prevZipRef.current && (
+      (individualInfo.zipPrefixChanged !== undefined 
+        ? individualInfo.zipPrefixChanged 
+        : true)
+    );
+    
+    if (individualInfo.zipPrefixChanged !== undefined) {
+      zipPrefixChangedRef.current = individualInfo.zipPrefixChanged;
+    }
+    
     const changedEmployeeCoverage = enrichedInfo.employeeCoverage !== prevEmployeeCoverageRef.current;
     const changedSpouseCoverage = enrichedInfo.spouseCoverage !== prevSpouseCoverageRef.current;
 
@@ -303,7 +312,8 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       // debouncedFetchProducts.cancel();
     };
   }, [enrichedInfo.age, enrichedInfo.annualSalary, enrichedInfo.zipCode, 
-    enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident, tokenInitialized]);
+    enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident, 
+    individualInfo.zipPrefixChanged, tokenInitialized]);
 
   return {
     quotes,

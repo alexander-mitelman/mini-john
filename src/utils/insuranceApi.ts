@@ -1,3 +1,4 @@
+
 // Define base types for our API
 export interface UserInfo {
   age: number;
@@ -6,6 +7,7 @@ export interface UserInfo {
   annualSalary?: number;
   employeeCoverage?: number;
   spouseCoverage?: number;
+  zipPrefixChanged?: boolean;
 }
 
 export type IndividualInfo = UserInfo;
