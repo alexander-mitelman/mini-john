@@ -6,6 +6,7 @@ const TOKEN_KEY = 'auth_token';
 const TOKEN_EXPIRY_KEY = 'auth_token_expiry';
 const AUTH_FAILURE_COUNT_KEY = 'auth_failure_count';
 const MAX_AUTH_FAILURES = 3;
+const MAX_FETCH_RETRIES = 5;
 
 // Retrieve token from local storage
 export function getToken(): string | null {
@@ -122,8 +123,8 @@ export async function fetchToken(): Promise<string> {
   }
 }
 
-// Generic function to make an authenticated request
-// If we get a 401 or any network error, refresh & retry
+// Generic function to make an authenticated request with retry logic
+// If we get a 401 or any network error, refresh & retry up to 5 times
 export async function fetchWithToken(url: string, config = { headers: {} }): Promise<any> {
   // If already exceeded max failures, don't even try
   if (hasExceededMaxFailures()) {
@@ -131,50 +132,65 @@ export async function fetchWithToken(url: string, config = { headers: {} }): Pro
     throw new Error('MAX_AUTH_FAILURES_EXCEEDED');
   }
 
-  // Ensure we have a valid token before making the request
-  const token = await ensureValidToken();
-  
-  // Insert token into request headers
-  const finalConfig = {
-    ...config,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...config.headers,
-    },
+  let retryCount = 0;
+  const executeRequest = async (): Promise<any> => {
+    // Ensure we have a valid token before making the request
+    const token = await ensureValidToken();
+    
+    // Insert token into request headers
+    const finalConfig = {
+      ...config,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...config.headers,
+      },
+    };
+
+    console.log(`Making authenticated request to: ${url} (Attempt ${retryCount + 1}/${MAX_FETCH_RETRIES + 1})`);
+    
+    try {
+      const resp = await axios(url, finalConfig);
+      console.log(`Request to ${url} successful:`, resp.status);
+      return resp;
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
+      
+      // If unauthorized (401) or network error, refresh token and retry
+      if (axiosError.response?.status === 401 || axiosError.code === 'ERR_NETWORK') {
+        console.error('Token has expired or network error, refreshing token...');
+        try {
+          // Clear existing token and fetch a new one
+          clearToken();
+          const newToken = await fetchToken();
+          
+          // Retry the request with the new token
+          finalConfig.headers.Authorization = `Bearer ${newToken}`;
+          console.log(`Retrying request to ${url} with new token`);
+          return axios(url, finalConfig);
+        } catch (refreshError) {
+          // Check if we've exceeded max failures after the refresh attempt
+          if (hasExceededMaxFailures()) {
+            throw new Error('MAX_AUTH_FAILURES_EXCEEDED');
+          }
+          throw refreshError;
+        }
+      }
+      
+      // For other errors, if we haven't exceeded max retries, try again
+      if (retryCount < MAX_FETCH_RETRIES) {
+        retryCount++;
+        console.log(`Request failed, retry attempt ${retryCount} of ${MAX_FETCH_RETRIES}`);
+        // Exponential backoff: wait 2^retryCount * 500ms before retrying (500ms, 1s, 2s, 4s, 8s)
+        const delay = Math.pow(2, retryCount - 1) * 500;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return executeRequest();
+      }
+        
+      console.error(`Error in request to ${url} after ${MAX_FETCH_RETRIES + 1} attempts:`, axiosError.message);
+      throw error;
+    }
   };
 
-  console.log(`Making authenticated request to: ${url}`);
-  
-  try {
-    const resp = await axios(url, finalConfig);
-    console.log(`Request to ${url} successful:`, resp.status);
-    return resp;
-  } catch (error: unknown) {
-    const axiosError = error as AxiosError;
-    
-    // If unauthorized (401) or network error, refresh token and retry
-    if (axiosError.response?.status === 401 || axiosError.code === 'ERR_NETWORK') {
-      console.error('Token has expired or network error, refreshing token...');
-      try {
-        // Clear existing token and fetch a new one
-        clearToken();
-        const newToken = await fetchToken();
-        
-        // Retry the request with the new token
-        finalConfig.headers.Authorization = `Bearer ${newToken}`;
-        console.log(`Retrying request to ${url} with new token`);
-        return axios(url, finalConfig);
-      } catch (refreshError) {
-        // Check if we've exceeded max failures after the refresh attempt
-        if (hasExceededMaxFailures()) {
-          throw new Error('MAX_AUTH_FAILURES_EXCEEDED');
-        }
-        throw refreshError;
-      }
-    }
-      
-    console.error(`Error in request to ${url}:`, axiosError.message);
-    throw error;
-  }
+  return executeRequest();
 }

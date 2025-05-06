@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { 
@@ -142,6 +141,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
         try {
           console.log(`Fetching ${product} from URL:`, url);
+          // fetchWithToken now has built-in retry logic
           const response = await fetchWithToken(url);
           console.log(`${product} response:`, response.data);
           
@@ -176,8 +176,8 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
             throw err;
           }
           
-          console.warn(`Error fetching ${product}:`, err);
-          toast.error(`Failed to fetch ${product} quote. Please try again.`);
+          console.warn(`Error fetching ${product} after multiple retries:`, err);
+          toast.error(`Failed to fetch ${product} quote after multiple attempts.`);
           return { product, data: null };
         }
       });
@@ -213,7 +213,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       
       if (err instanceof Error) {
         setError(err.message || 'Unknown error');
-        toast.error("Failed to fetch quotes. Please try again.");
+        toast.error("Failed to fetch quotes after multiple retries. Please try again.");
       }
     } finally {
       setLoading(false);
