@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { 
@@ -5,7 +6,9 @@ import {
   getToken, 
   fetchToken, 
   hasExceededMaxFailures, 
-  resetAuthFailureCount 
+  resetAuthFailureCount,
+  isTokenValid,
+  isServerCalculations
 } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
@@ -13,7 +16,13 @@ import { toast } from 'sonner';
 import { extractQuota } from '../utils/quoteExtractor';
 import AuthErrorModal from '../components/AuthErrorModal';
 
-interface ProductQuotes {
+type ParsedUrlParams = {
+  zipCode?: string;
+  age?: number;
+  annualSalary?: number;
+};
+
+interface Quotes {
   ltd: any | null;
   std: any | null;
   life: any | null;
@@ -21,30 +30,25 @@ interface ProductQuotes {
   dental: any | null;
   vision: any | null;
   critical: any | null;
+  hospital: any | null;
+  tele: any | null;
+  identity: any | null;
 }
 
-interface ProductTriggers {
-  age?: boolean;
-  annualSalary?: boolean;
-  zipCode?: boolean;
-  employeeCoverage?: boolean;
-  spouseCoverage?: boolean;
+function isStaticData(quotes: Quotes, product: keyof typeof productConfig) {
+  return (
+    (product === 'accident' && quotes.accident !== null)
+  );
 }
 
 /**
  * Hook for managing insurance quotes
  * Fetches and updates quotes based on changes to user information
  */
-export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
-  const enrichedInfo = {
-    ...individualInfo,
-    annualSalary: individualInfo.annualSalary || 
-      (individualInfo.income ? parseInt(individualInfo.income.replace(/\$|,/g, '')) : 0),
-    employeeCoverage: individualInfo.employeeCoverage || 20000,
-    spouseCoverage: individualInfo.spouseCoverage || 10000,
-  };
+export function useQuotes(individualInfo: IndividualInfo, urlParams: ParsedUrlParams, inputError: string) {
 
-  const [quotes, setQuotes] = useState<ProductQuotes>({
+  // We'll store results for each product in an object:
+  const [quotes, setQuotes] = useState<Quotes>({
     ltd: null,
     std: null,
     life: null,
@@ -52,36 +56,69 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     dental: null,
     vision: null,
     critical: null,
+    hospital: null,
+    tele: null,
+    identity: null,
   });
 
+  // Track loading state—optional if you want partial loading per product
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [tokenInitialized, setTokenInitialized] = useState(!!getToken());
+  const [tokenReady, setTokenReady] = useState(false);
   const [showAuthErrorModal, setShowAuthErrorModal] = useState(hasExceededMaxFailures());
 
-  const prevAgeRef = useRef(enrichedInfo.age);
-  const prevSalaryRef = useRef(enrichedInfo.annualSalary);
-  const prevZipRef = useRef(enrichedInfo.zipCode);
-  const prevEmployeeCoverageRef = useRef(enrichedInfo.employeeCoverage);
-  const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
-  const zipPrefixChangedRef = useRef(false);
+  // We'll store old values of age, salary, zipCode
+  const prevAgeRef = useRef(individualInfo.age);
+  const prevSalaryRef = useRef(individualInfo.annualSalary);
+  const prevZipRef = useRef(individualInfo.zipCode);
+  const prevEmployeeCoverageRef = useRef(individualInfo.employeeCoverage);
+  const prevSpouseCoverageRef = useRef(individualInfo.spouseCoverage);
 
-  useEffect(() => {
-    console.log('Component mounted, checking authentication status');
-    
-    if (hasExceededMaxFailures()) {
-      console.log('Maximum auth failures detected at startup');
-      setShowAuthErrorModal(true);
+  const handleCloseAuthErrorModal = useCallback(() => {
+    setShowAuthErrorModal(false);
+    resetAuthFailureCount();
+  }, []);
+
+  const init = useCallback(() => {
+    const productsToFetch = [] as string[];
+  
+    // For each product, check if any triggers changed
+    for (const product of Object.keys(productConfig)) {
+      const triggers = productConfig[product as keyof typeof productConfig].triggers;
+  
+      let needsFetch = false;
+      if (triggers && triggers.age && urlParams.age && urlParams.age > 0) needsFetch = true;
+      if (triggers && triggers.annualSalary && urlParams.annualSalary && urlParams.annualSalary > 0) needsFetch = true;
+      if (triggers && triggers.zipCode && urlParams.zipCode) needsFetch = true;
+
+      if (!needsFetch) {
+        continue;
+      }
+  
+      productsToFetch.push(product);
+    }
+  
+    if (productsToFetch.length <= 0) { 
       return;
     }
-    
-    const initializeAuth = async () => {
-      if (!getToken()) {
-        console.log('No token found, initiating token fetch');
+
+    return fetchProducts(productsToFetch, {
+      age: individualInfo.age,
+      annualSalary: individualInfo.annualSalary,
+      zipCode: individualInfo.zipCode,
+      employeeCoverage: individualInfo.employeeCoverage,
+      spouseCoverage: individualInfo.spouseCoverage,
+    });
+  }, [individualInfo, urlParams, fetchProducts]);
+
+  // Effect 1: Ensure token is valid
+  useEffect(() => {
+    if (!isServerCalculations()) return;
+
+    async function ensureToken() {
+      if (!isTokenValid()) {
         try {
           await fetchToken();
-          setTokenInitialized(true);
         } catch (err) {
           console.error('Error fetching initial token:', err);
           
@@ -91,15 +128,13 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
           }
           
           toast.error("Failed to authenticate. Retrying...");
-          setTimeout(initializeAuth, 3000);
+          setTimeout(ensureToken, 3000);
         }
-      } else {
-        console.log('Token already exists in localStorage');
-        setTokenInitialized(true);
       }
-    };
-    
-    initializeAuth();
+      setTokenReady(true);
+    }
+
+    ensureToken();
   }, []);
 
   useEffect(() => {
@@ -108,17 +143,20 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     }
   }, [showAuthErrorModal]);
 
-  const handleCloseAuthErrorModal = useCallback(() => {
-    setShowAuthErrorModal(false);
-    resetAuthFailureCount();
-  }, []);
+  // Effect 2: Run quote fetching only when token is ready
+  useEffect(() => {
+    if (!isServerCalculations() || !tokenReady) return;
 
+    init();
+  }, [tokenReady, init]);
+
+  // The main function to fetch quotes for a set of products
   const fetchProducts = useCallback(async (productsToFetch: string[], individualInfo: Partial<IndividualInfo>) => {
     if (inputError) {
       return;
     }
     
-    if (!tokenInitialized) {
+    if (!tokenReady) {
       console.log('Token not initialized yet, waiting...');
       return;
     }
@@ -131,12 +169,10 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     setLoading(true);
     setError(null);
     try {
-      console.log("Fetching products:", productsToFetch);
+      // We'll do all requests in parallel
       const requests = productsToFetch.map(async (product) => {
         const { buildUrl } = productConfig[product as keyof typeof productConfig];
         const pathname = buildUrl(individualInfo as IndividualInfo);
-        
-        // Always append the 'a=babrm' parameter
         let url = URI_SETTINGS.quote() + pathname;
         url += ((url.includes('?') ? '&' : '?') + 'a=babrm');
 
@@ -191,7 +227,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
         const updated = { ...prev };
         for (const result of promiseResults) {
           if (result.status === 'fulfilled') {
-            updated[result.value.product as keyof ProductQuotes] = result.value.data;
+            updated[result.value.product as keyof Quotes] = result.value.data;
           } else {
             hasFailures = true;
           }
@@ -218,8 +254,9 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     } finally {
       setLoading(false);
     }
-  }, [inputError, tokenInitialized]);
+  }, [inputError, tokenReady]);
 
+  // Debounced version of fetchProducts
   const debouncedFetchProducts = useCallback(
     debounce((productsToFetch, values) => {
       return fetchProducts(productsToFetch, values);
@@ -227,64 +264,44 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     [fetchProducts]
   );
 
+  // The effect that checks what changed
   useEffect(() => {
-    const fetchAllProductsOnMount = async () => {
-      if (!initialFetchComplete && !inputError && tokenInitialized) {
-        console.log('Performing initial fetch of all products');
-        const allProducts = Object.keys(productConfig);
-        
-        try {
-          await fetchProducts(allProducts, enrichedInfo);
-          setInitialFetchComplete(true);
-        } catch (err) {
-          console.error('Error during initial fetch:', err);
-          setTimeout(() => {
-            if (!initialFetchComplete) {
-              fetchAllProductsOnMount();
-            }
-          }, 5000);
-        }
-      }
-    };
-    
-    fetchAllProductsOnMount();
-  }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError, tokenInitialized]);
-
-  useEffect(() => {
-    const changedAge = enrichedInfo.age !== prevAgeRef.current;
-    const changedSalary = enrichedInfo.annualSalary !== prevSalaryRef.current;
-    const changedZip = enrichedInfo.zipCode !== prevZipRef.current && (
-      (individualInfo.zipPrefixChanged !== undefined 
-        ? individualInfo.zipPrefixChanged 
-        : true)
-    );
-    
-    if (individualInfo.zipPrefixChanged !== undefined) {
-      zipPrefixChangedRef.current = individualInfo.zipPrefixChanged;
+    if (!isServerCalculations() || !tokenReady) {
+      return;
     }
-    
-    const changedEmployeeCoverage = enrichedInfo.employeeCoverage !== prevEmployeeCoverageRef.current;
-    const changedSpouseCoverage = enrichedInfo.spouseCoverage !== prevSpouseCoverageRef.current;
 
-    const productsToFetch: string[] = [];
+    const changedAge = individualInfo.age !== prevAgeRef.current;
+    const changedSalary = individualInfo.annualSalary !== prevSalaryRef.current;
+    const changedZip = individualInfo.zipCode.slice(0,3) !== prevZipRef.current.slice(0,3);
+    const changedEmployeeCoverage = individualInfo.employeeCoverage !== prevEmployeeCoverageRef.current;
+    const changedSpouseCoverage = individualInfo.spouseCoverage !== prevSpouseCoverageRef.current;
 
+    const productsToFetch = [] as string[];
+
+    // For each product, check if any triggers changed
     for (const product of Object.keys(productConfig)) {
-      const triggers = productConfig[product as keyof typeof productConfig].triggers as ProductTriggers;
-      
+      const triggers = productConfig[product as keyof typeof productConfig].triggers;
+      // If triggers.age is true and changedAge is true -> fetch
+      // If triggers.salary is true and changedSalary is true -> fetch
+      // If triggers.zipCode is true and changedZip is true -> fetch
+      // and etc...
+
       let needsFetch = false;
-      
-      if (triggers.age && changedAge) needsFetch = true;
-      if (triggers.annualSalary && changedSalary) needsFetch = true;
-      if (triggers.zipCode && changedZip) needsFetch = true;
-      if (triggers.employeeCoverage && changedEmployeeCoverage) needsFetch = true;
-      if (triggers.spouseCoverage && changedSpouseCoverage) needsFetch = true;
+      if (triggers && triggers.age && changedAge) needsFetch = true;
+      if (triggers && triggers.annualSalary && changedSalary) needsFetch = true;
+      if (triggers && triggers.zipCode && changedZip) needsFetch = true;
+      if (triggers && triggers.employeeCoverage && changedEmployeeCoverage) needsFetch = true;
+      if (triggers && triggers.spouseCoverage && changedSpouseCoverage) needsFetch = true;
 
       if (needsFetch) {
-        if (product === 'accident' && quotes.accident !== null) {
-          continue;
+        // Skip 'accident' if we've already fetched it
+        if (isStaticData(quotes, product as keyof typeof productConfig)) {
+          // Do nothing
+          // accident should be fetched only once, because it doesn't have any dependencies
         }
-        else if (product === 'std' && enrichedInfo.annualSalary && enrichedInfo.annualSalary <= 0) { 
-          continue;
+        // Skip 'std' if there's no salary info
+        else if (product === 'std' && individualInfo.annualSalary <= 0) { 
+          // Do nothing
         } 
         else {
           productsToFetch.push(product);
@@ -292,28 +309,36 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       }
     }
 
-    if (productsToFetch.length > 0 && tokenInitialized) {
+    if (productsToFetch.length > 0) {
       debouncedFetchProducts(productsToFetch, {
-        age: enrichedInfo.age,
-        annualSalary: enrichedInfo.annualSalary,
-        zipCode: enrichedInfo.zipCode,
-        employeeCoverage: enrichedInfo.employeeCoverage,
-        spouseCoverage: enrichedInfo.spouseCoverage,
+        age: individualInfo.age,
+        annualSalary: individualInfo.annualSalary,
+        zipCode: individualInfo.zipCode,
+        employeeCoverage: individualInfo.employeeCoverage,
+        spouseCoverage: individualInfo.spouseCoverage,
       });
     }
 
-    prevAgeRef.current = enrichedInfo.age;
-    prevSalaryRef.current = enrichedInfo.annualSalary;
-    prevZipRef.current = enrichedInfo.zipCode;
-    prevEmployeeCoverageRef.current = enrichedInfo.employeeCoverage;
-    prevSpouseCoverageRef.current = enrichedInfo.spouseCoverage;
+    prevAgeRef.current = individualInfo.age;
+    prevSalaryRef.current = individualInfo.annualSalary;
+    prevZipRef.current = individualInfo.zipCode;
+    prevEmployeeCoverageRef.current = individualInfo.employeeCoverage;
+    prevSpouseCoverageRef.current = individualInfo.spouseCoverage;
 
+    // Cleanup to avoid memory leaks
     return () => {
       // debouncedFetchProducts.cancel();
     };
-  }, [enrichedInfo.age, enrichedInfo.annualSalary, enrichedInfo.zipCode, 
-    enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident, 
-    individualInfo.zipPrefixChanged, tokenInitialized]);
+  }, [
+    individualInfo.age, 
+    individualInfo.annualSalary, 
+    individualInfo.zipCode, 
+    individualInfo.employeeCoverage, 
+    individualInfo.spouseCoverage, 
+    tokenReady,
+    quotes,
+    debouncedFetchProducts
+  ]);
 
   return {
     quotes,
