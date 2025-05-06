@@ -5,6 +5,28 @@ import axios, { AxiosError } from 'axios';
 const TOKEN_KEY = 'auth_token';
 const AUTH_FAILURE_COUNT_KEY = 'auth_failure_count';
 const MAX_AUTH_FAILURES = 3;
+const TOKEN_EXPIRY_KEY = 'auth_token_expiry';
+
+// Check if server calculations should be performed
+export function isServerCalculations(): boolean {
+  // This could be based on a config flag, URL parameter, or other condition
+  // For now, we'll return true to enable server calculations by default
+  return true;
+}
+
+// Check if the stored token is still valid
+export function isTokenValid(): boolean {
+  const token = getToken();
+  if (!token) return false;
+  
+  // Check if token has an expiry time stored
+  const expiryTime = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  if (!expiryTime) return false;
+  
+  // Compare current time with expiry time
+  const now = new Date().getTime();
+  return now < parseInt(expiryTime, 10);
+}
 
 // Retrieve token from local storage
 export function getToken(): string | null {
@@ -17,6 +39,11 @@ export function getToken(): string | null {
 export function setToken(token: string): void {
   console.log('Storing new token in localStorage');
   localStorage.setItem(TOKEN_KEY, token);
+  
+  // Set expiry time (e.g., 1 hour from now)
+  const expiryTime = new Date().getTime() + (60 * 60 * 1000); // 1 hour
+  localStorage.setItem(TOKEN_EXPIRY_KEY, expiryTime.toString());
+  
   // Reset auth failure count on successful token set
   resetAuthFailureCount();
 }
@@ -25,6 +52,7 @@ export function setToken(token: string): void {
 export function clearToken(): void {
   console.log('Clearing token from localStorage');
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_EXPIRY_KEY);
 }
 
 // Track authentication failures
