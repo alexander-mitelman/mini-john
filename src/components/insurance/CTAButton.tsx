@@ -13,9 +13,9 @@ export const CTAButton: React.FC<CTAButtonProps> = ({
   return (
     <button
       onClick={onClick}
-      className="w-full justify-center items-center shadow-[0px_16px_60px_0px_rgba(67,83,255,0.40)] bg-white flex gap-[7px] text-base font-extrabold capitalize leading-loose px-[34px] py-[13px] rounded-[38.814px] border-[2.477px] border-solid border-primary hover:bg-primary hover:text-white transition-all duration-300 group"
+      className="w-full justify-center items-center shadow-[0px_16px_60px_0px_rgba(67,83,255,0.40)] bg-white flex gap-[7px] text-base font-extrabold capitalize leading-loose px-[34px] py-[13px] rounded-[38.814px] border-[2.477px] border-solid border-[#4353FF] hover:bg-[#4353FF] hover:text-white transition-all duration-300 group"
     >
-      <span className="bg-clip-text bg-primary text-transparent self-stretch my-auto group-hover:text-white transition-colors">
+      <span className="bg-clip-text text-transparent bg-[#4353FF] self-stretch my-auto group-hover:text-white transition-colors">
         {text}
       </span>
       <img

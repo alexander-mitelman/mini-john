@@ -90,16 +90,16 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
     
     return (
       <div className="flex flex-col items-end">
-        <span className={`text-sm font-bold ${isExpanded ? 'text-[#4361EE]' : 'text-[#000000]'}`}>
+        <span className={`text-sm font-bold ${isExpanded ? 'text-[#4353FF]' : 'text-[#000000]'}`}>
           {priceValue}
         </span>
-        <span className="text-xs text-gray-500">{interval}</span>
+        <span className="text-xs text-[#6B7280]">{interval}</span>
       </div>
     );
   };
 
   return (
-    <div className={`${isExpanded ? 'bg-[rgba(67,83,255,0.05)] border-2 border-[#4361EE]' : 'bg-white border border-[#E2E8F0]'} rounded-xl overflow-hidden shadow-sm ${className}`}>
+    <div className={`${isExpanded ? 'bg-[rgba(67,83,255,0.05)] border-2 border-[#4353FF]' : 'bg-white border border-[#E2E8F0]'} rounded-xl overflow-hidden shadow-sm ${className}`}>
       <div 
         className="flex w-full items-center justify-between p-4 cursor-pointer"
         onClick={onExpand}
@@ -107,11 +107,11 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
         <div className="flex items-center gap-3">
           {renderIcon()}
           <div className="flex flex-col">
-            <div className="text-sm font-bold text-[#4361EE]">
+            <div className="text-sm font-bold text-[#4353FF]">
               {title}
             </div>
             {caption && (
-              <div className="text-xs text-[#8E9196] mt-0.5">
+              <div className="text-xs text-[#6B7280] mt-0.5">
                 {caption}
               </div>
             )}
@@ -124,7 +124,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
               checked={enabled}
               onCheckedChange={onToggle}
               onClick={(e) => e.stopPropagation()}
-              className="data-[state=checked]:bg-[#4361EE]"
+              className="data-[state=checked]:bg-[#4353FF]"
             />
             {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </div>
@@ -136,7 +136,7 @@ export const InsurancePlanCard: React.FC<InsurancePlanCardProps> = ({
           className="px-4 pb-4"
         >
           {description && (
-            <p className="text-sm text-gray-700 mb-4">
+            <p className="text-sm text-[#6B7280] mb-4">
               {description}
             </p>
           )}

@@ -35,4 +35,3 @@ export const InsuranceSummary: React.FC<InsuranceSummaryProps> = ({
     </section>
   );
 };
-

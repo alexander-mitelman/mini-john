@@ -13,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #4353FFAA); /* Digital Blue */
+  filter: drop-shadow(0 0 2em #4353FF); /* Digital Blue */
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #00F0B5AA); /* Neon Turquoise */
+  filter: drop-shadow(0 0 2em #00F0B5); /* Neon Turquoise */
 }
 
 @keyframes logo-spin {
