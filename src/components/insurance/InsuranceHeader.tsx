@@ -12,12 +12,13 @@ export const InsuranceHeader: React.FC<InsuranceHeaderProps> = ({
 }) => {
   return (
     <header className="flex flex-col items-center">
-      <h1 className="text-[rgba(67,83,255,1)] text-2xl font-bold text-center font-nunito">
+      <h1 className="text-primary text-2xl font-bold text-center font-nunito">
         {title}
       </h1>
-      <p className="text-[rgba(102,112,133,1)] text-lg font-medium text-center mt-8 font-nunito">
+      <p className="text-neutral text-lg font-medium text-center mt-8 font-nunito">
         {description}
       </p>
     </header>
   );
 };
+
