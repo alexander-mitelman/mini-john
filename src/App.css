@@ -13,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #4353FFAA); /* Updated to Digital Blue */
+  filter: drop-shadow(0 0 2em #4353FFAA); /* Digital Blue */
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #00F0B5AA); /* Updated to Neon Turquoise */
+  filter: drop-shadow(0 0 2em #00F0B5AA); /* Neon Turquoise */
 }
 
 @keyframes logo-spin {
@@ -39,6 +39,5 @@
 }
 
 .read-the-docs {
-  color: #6B7280; /* Updated to Steel Gray */
+  color: #6B7280; /* Steel Gray */
 }
-

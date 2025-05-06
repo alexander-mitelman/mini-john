@@ -21,4 +21,3 @@ export const InsuranceHeader: React.FC<InsuranceHeaderProps> = ({
     </header>
   );
 };
-
