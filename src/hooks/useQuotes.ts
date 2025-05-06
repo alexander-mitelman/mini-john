@@ -7,8 +7,7 @@ import {
   fetchToken, 
   hasExceededMaxFailures, 
   resetAuthFailureCount,
-  isTokenValid,
-  isServerCalculations
+  isTokenValid
 } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
 import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
@@ -79,79 +78,8 @@ export function useQuotes(individualInfo: IndividualInfo, urlParams: ParsedUrlPa
     resetAuthFailureCount();
   }, []);
 
-  const init = useCallback(() => {
-    const productsToFetch = [] as string[];
-  
-    // For each product, check if any triggers changed
-    for (const product of Object.keys(productConfig)) {
-      const triggers = productConfig[product as keyof typeof productConfig].triggers;
-  
-      let needsFetch = false;
-      if (triggers && triggers.age && urlParams.age && urlParams.age > 0) needsFetch = true;
-      if (triggers && triggers.annualSalary && urlParams.annualSalary && urlParams.annualSalary > 0) needsFetch = true;
-      if (triggers && triggers.zipCode && urlParams.zipCode) needsFetch = true;
-
-      if (!needsFetch) {
-        continue;
-      }
-  
-      productsToFetch.push(product);
-    }
-  
-    if (productsToFetch.length <= 0) { 
-      return;
-    }
-
-    return fetchProducts(productsToFetch, {
-      age: individualInfo.age,
-      annualSalary: individualInfo.annualSalary,
-      zipCode: individualInfo.zipCode,
-      employeeCoverage: individualInfo.employeeCoverage,
-      spouseCoverage: individualInfo.spouseCoverage,
-    });
-  }, [individualInfo, urlParams, fetchProducts]);
-
-  // Effect 1: Ensure token is valid
-  useEffect(() => {
-    if (!isServerCalculations()) return;
-
-    async function ensureToken() {
-      if (!isTokenValid()) {
-        try {
-          await fetchToken();
-        } catch (err) {
-          console.error('Error fetching initial token:', err);
-          
-          if (hasExceededMaxFailures()) {
-            setShowAuthErrorModal(true);
-            return;
-          }
-          
-          toast.error("Failed to authenticate. Retrying...");
-          setTimeout(ensureToken, 3000);
-        }
-      }
-      setTokenReady(true);
-    }
-
-    ensureToken();
-  }, []);
-
-  useEffect(() => {
-    if (hasExceededMaxFailures() && !showAuthErrorModal) {
-      setShowAuthErrorModal(true);
-    }
-  }, [showAuthErrorModal]);
-
-  // Effect 2: Run quote fetching only when token is ready
-  useEffect(() => {
-    if (!isServerCalculations() || !tokenReady) return;
-
-    init();
-  }, [tokenReady, init]);
-
   // The main function to fetch quotes for a set of products
-  const fetchProducts = useCallback(async (productsToFetch: string[], individualInfo: Partial<IndividualInfo>) => {
+  const fetchProducts = useCallback(async (productsToFetch: string[], individualInfoParam: Partial<IndividualInfo>) => {
     if (inputError) {
       return;
     }
@@ -172,7 +100,7 @@ export function useQuotes(individualInfo: IndividualInfo, urlParams: ParsedUrlPa
       // We'll do all requests in parallel
       const requests = productsToFetch.map(async (product) => {
         const { buildUrl } = productConfig[product as keyof typeof productConfig];
-        const pathname = buildUrl(individualInfo as IndividualInfo);
+        const pathname = buildUrl(individualInfoParam as IndividualInfo);
         let url = URI_SETTINGS.quote() + pathname;
         url += ((url.includes('?') ? '&' : '?') + 'a=babrm');
 
@@ -256,6 +184,75 @@ export function useQuotes(individualInfo: IndividualInfo, urlParams: ParsedUrlPa
     }
   }, [inputError, tokenReady]);
 
+  const init = useCallback(() => {
+    const productsToFetch = [] as string[];
+  
+    // For each product, check if any triggers changed
+    for (const product of Object.keys(productConfig)) {
+      const triggers = productConfig[product as keyof typeof productConfig].triggers;
+  
+      let needsFetch = false;
+      if (triggers && triggers.age && urlParams.age && urlParams.age > 0) needsFetch = true;
+      if (triggers && triggers.annualSalary && urlParams.annualSalary && urlParams.annualSalary > 0) needsFetch = true;
+      if (triggers && triggers.zipCode && urlParams.zipCode) needsFetch = true;
+
+      if (!needsFetch) {
+        continue;
+      }
+  
+      productsToFetch.push(product);
+    }
+  
+    if (productsToFetch.length <= 0) { 
+      return;
+    }
+
+    return fetchProducts(productsToFetch, {
+      age: individualInfo.age,
+      annualSalary: individualInfo.annualSalary,
+      zipCode: individualInfo.zipCode,
+      employeeCoverage: individualInfo.employeeCoverage,
+      spouseCoverage: individualInfo.spouseCoverage,
+    });
+  }, [individualInfo, urlParams, fetchProducts]);
+
+  // Effect 1: Ensure token is valid
+  useEffect(() => {
+    async function ensureToken() {
+      if (!isTokenValid()) {
+        try {
+          await fetchToken();
+        } catch (err) {
+          console.error('Error fetching initial token:', err);
+          
+          if (hasExceededMaxFailures()) {
+            setShowAuthErrorModal(true);
+            return;
+          }
+          
+          toast.error("Failed to authenticate. Retrying...");
+          setTimeout(ensureToken, 3000);
+        }
+      }
+      setTokenReady(true);
+    }
+
+    ensureToken();
+  }, []);
+
+  useEffect(() => {
+    if (hasExceededMaxFailures() && !showAuthErrorModal) {
+      setShowAuthErrorModal(true);
+    }
+  }, [showAuthErrorModal]);
+
+  // Effect 2: Run quote fetching only when token is ready
+  useEffect(() => {
+    if (!tokenReady) return;
+
+    init();
+  }, [tokenReady, init]);
+
   // Debounced version of fetchProducts
   const debouncedFetchProducts = useCallback(
     debounce((productsToFetch, values) => {
@@ -266,7 +263,7 @@ export function useQuotes(individualInfo: IndividualInfo, urlParams: ParsedUrlPa
 
   // The effect that checks what changed
   useEffect(() => {
-    if (!isServerCalculations() || !tokenReady) {
+    if (!tokenReady) {
       return;
     }
 

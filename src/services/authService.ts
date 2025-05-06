@@ -7,13 +7,6 @@ const AUTH_FAILURE_COUNT_KEY = 'auth_failure_count';
 const MAX_AUTH_FAILURES = 3;
 const TOKEN_EXPIRY_KEY = 'auth_token_expiry';
 
-// Check if server calculations should be performed
-export function isServerCalculations(): boolean {
-  // This could be based on a config flag, URL parameter, or other condition
-  // For now, we'll return true to enable server calculations by default
-  return true;
-}
-
 // Check if the stored token is still valid
 export function isTokenValid(): boolean {
   const token = getToken();
