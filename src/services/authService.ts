@@ -3,6 +3,7 @@ import { URI_SETTINGS } from '../utils/config';
 import axios, { AxiosError } from 'axios';
 
 const TOKEN_KEY = 'auth_token';
+const TOKEN_EXPIRY_KEY = 'auth_token_expiry';
 const AUTH_FAILURE_COUNT_KEY = 'auth_failure_count';
 const MAX_AUTH_FAILURES = 3;
 
@@ -13,18 +14,45 @@ export function getToken(): string | null {
   return token;
 }
 
-// Store token in local storage
-export function setToken(token: string): void {
+// Store token in local storage with an expiry time (1 hour from now by default)
+export function setToken(token: string, expiryInMs = 3600000): void {
   console.log('Storing new token in localStorage');
   localStorage.setItem(TOKEN_KEY, token);
+  
+  // Set token expiry time
+  const expiryTime = Date.now() + expiryInMs;
+  localStorage.setItem(TOKEN_EXPIRY_KEY, expiryTime.toString());
+  
   // Reset auth failure count on successful token set
   resetAuthFailureCount();
+}
+
+// Check if the token is valid (not expired)
+export function isTokenValid(): boolean {
+  const token = getToken();
+  if (!token) {
+    console.log('No token found, not valid');
+    return false;
+  }
+  
+  const expiryTimeStr = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  if (!expiryTimeStr) {
+    console.log('No expiry time found for token, considering invalid');
+    return false;
+  }
+  
+  const expiryTime = parseInt(expiryTimeStr, 10);
+  const isValid = Date.now() < expiryTime;
+  
+  console.log('Token validity check:', isValid ? 'Valid' : 'Expired');
+  return isValid;
 }
 
 // Clear token from storage (useful for debugging)
 export function clearToken(): void {
   console.log('Clearing token from localStorage');
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_EXPIRY_KEY);
 }
 
 // Track authentication failures
@@ -48,6 +76,21 @@ export function resetAuthFailureCount(): void {
 
 export function hasExceededMaxFailures(): boolean {
   return getAuthFailureCount() >= MAX_AUTH_FAILURES;
+}
+
+// Ensure we have a valid token or fetch a new one
+export async function ensureValidToken(): Promise<string> {
+  console.log('Ensuring we have a valid token');
+  
+  // Check if we have a token and if it's still valid
+  if (isTokenValid()) {
+    console.log('Current token is still valid, using it');
+    return getToken()!;
+  }
+  
+  // No token or expired token, fetch a new one
+  console.log('Token missing or expired, fetching a new one');
+  return fetchToken();
 }
 
 // Fetch a new token from /auth
@@ -88,13 +131,9 @@ export async function fetchWithToken(url: string, config = { headers: {} }): Pro
     throw new Error('MAX_AUTH_FAILURES_EXCEEDED');
   }
 
-  let token = getToken();
+  // Ensure we have a valid token before making the request
+  const token = await ensureValidToken();
   
-  if (!token) {
-    console.log('No token found, fetching a new one before request');
-    token = await fetchToken();
-  }
-
   // Insert token into request headers
   const finalConfig = {
     ...config,
@@ -118,10 +157,12 @@ export async function fetchWithToken(url: string, config = { headers: {} }): Pro
     if (axiosError.response?.status === 401 || axiosError.code === 'ERR_NETWORK') {
       console.error('Token has expired or network error, refreshing token...');
       try {
-        // Refresh the token
-        token = await fetchToken();
+        // Clear existing token and fetch a new one
+        clearToken();
+        const newToken = await fetchToken();
+        
         // Retry the request with the new token
-        finalConfig.headers.Authorization = `Bearer ${token}`;
+        finalConfig.headers.Authorization = `Bearer ${newToken}`;
         console.log(`Retrying request to ${url} with new token`);
         return axios(url, finalConfig);
       } catch (refreshError) {

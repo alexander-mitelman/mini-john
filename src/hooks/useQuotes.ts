@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { debounce } from '../utils/debounce';
 import { 
@@ -5,10 +6,12 @@ import {
   getToken, 
   fetchToken, 
   hasExceededMaxFailures, 
-  resetAuthFailureCount 
+  resetAuthFailureCount,
+  isTokenValid,
+  ensureValidToken
 } from '../services/authService';
 import { IndividualInfo, productConfig } from '../utils/insuranceApi';
-import { BABRM, DEBOUNCE_DELAY, URI_SETTINGS, isDistributor } from '../utils/config';
+import { DEBOUNCE_DELAY, URI_SETTINGS } from '../utils/config';
 import { toast } from 'sonner';
 import { extractQuota } from '../utils/quoteExtractor';
 import AuthErrorModal from '../components/AuthErrorModal';
@@ -57,7 +60,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialFetchComplete, setInitialFetchComplete] = useState(false);
-  const [tokenInitialized, setTokenInitialized] = useState(!!getToken());
+  const [tokenReady, setTokenReady] = useState(false);
   const [showAuthErrorModal, setShowAuthErrorModal] = useState(hasExceededMaxFailures());
 
   const prevAgeRef = useRef(enrichedInfo.age);
@@ -67,6 +70,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
   const prevSpouseCoverageRef = useRef(enrichedInfo.spouseCoverage);
   const zipPrefixChangedRef = useRef(false);
 
+  // Initialize auth and ensure we have a valid token
   useEffect(() => {
     console.log('Component mounted, checking authentication status');
     
@@ -77,25 +81,21 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     }
     
     const initializeAuth = async () => {
-      if (!getToken()) {
-        console.log('No token found, initiating token fetch');
-        try {
-          await fetchToken();
-          setTokenInitialized(true);
-        } catch (err) {
-          console.error('Error fetching initial token:', err);
-          
-          if (hasExceededMaxFailures()) {
-            setShowAuthErrorModal(true);
-            return;
-          }
-          
-          toast.error("Failed to authenticate. Retrying...");
-          setTimeout(initializeAuth, 3000);
+      try {
+        // This will check if token exists and is valid
+        // If not valid or doesn't exist, it will fetch a new one
+        await ensureValidToken();
+        setTokenReady(true);
+      } catch (err) {
+        console.error('Error during token initialization:', err);
+        
+        if (hasExceededMaxFailures()) {
+          setShowAuthErrorModal(true);
+          return;
         }
-      } else {
-        console.log('Token already exists in localStorage');
-        setTokenInitialized(true);
+        
+        toast.error("Failed to authenticate. Retrying...");
+        setTimeout(initializeAuth, 3000);
       }
     };
     
@@ -118,8 +118,8 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       return;
     }
     
-    if (!tokenInitialized) {
-      console.log('Token not initialized yet, waiting...');
+    if (!tokenReady) {
+      console.log('Token not ready yet, waiting...');
       return;
     }
     
@@ -218,7 +218,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     } finally {
       setLoading(false);
     }
-  }, [inputError, tokenInitialized]);
+  }, [inputError, tokenReady]);
 
   const debouncedFetchProducts = useCallback(
     debounce((productsToFetch, values) => {
@@ -229,7 +229,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
 
   useEffect(() => {
     const fetchAllProductsOnMount = async () => {
-      if (!initialFetchComplete && !inputError && tokenInitialized) {
+      if (!initialFetchComplete && !inputError && tokenReady) {
         console.log('Performing initial fetch of all products');
         const allProducts = Object.keys(productConfig);
         
@@ -248,7 +248,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     };
     
     fetchAllProductsOnMount();
-  }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError, tokenInitialized]);
+  }, [fetchProducts, enrichedInfo, initialFetchComplete, inputError, tokenReady]);
 
   useEffect(() => {
     const changedAge = enrichedInfo.age !== prevAgeRef.current;
@@ -292,7 +292,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
       }
     }
 
-    if (productsToFetch.length > 0 && tokenInitialized) {
+    if (productsToFetch.length > 0 && tokenReady) {
       debouncedFetchProducts(productsToFetch, {
         age: enrichedInfo.age,
         annualSalary: enrichedInfo.annualSalary,
@@ -313,7 +313,7 @@ export function useQuotes(individualInfo: IndividualInfo, inputError: string) {
     };
   }, [enrichedInfo.age, enrichedInfo.annualSalary, enrichedInfo.zipCode, 
     enrichedInfo.employeeCoverage, enrichedInfo.spouseCoverage, debouncedFetchProducts, quotes.accident, 
-    individualInfo.zipPrefixChanged, tokenInitialized]);
+    individualInfo.zipPrefixChanged, tokenReady]);
 
   return {
     quotes,

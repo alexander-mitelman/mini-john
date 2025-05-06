@@ -36,7 +36,7 @@ const Index = () => {
   // Track which product is expanded
   const [expandedProduct, setExpandedProduct] = useState<string | null>("ltd");
 
-  // Get quotes from hook
+  // Get quotes from hook - pass only userInfo and inputError as required by the latest implementation
   const { 
     quotes, 
     loading, 
